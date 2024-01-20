@@ -1,5 +1,3 @@
-// ignore_for_file: file_names
-
 import 'dart:async';
 import 'dart:convert';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -7,6 +5,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:pomo_rush/utils/preferences.dart';
 import 'package:pomo_rush/utils/utils.dart';
+import 'package:pomo_rush/screens/timerSettingScreen.dart';
 
 class MoneyTimerWidget extends StatefulWidget {
   const MoneyTimerWidget({super.key});
@@ -243,13 +242,17 @@ class _MoneyTimerWidgetState extends State<MoneyTimerWidget> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  isFocus ? const Text('Focus') : const Text('Break'),
+                  isFocus ? const Text('Focus', style: TextStyle(color: Colors.white)) : const Text('Break', style: TextStyle(color: Colors.white)),
                   const SizedBox(height: 5),
                   isFocus
                       ? Text(
-                      '${timerTime.inHours.toString().padLeft(2, "0")}:${timerTime.inMinutes.toString().padLeft(2, "0")}:${timerTime.inSeconds.remainder(60).toString().padLeft(2, "0")}')
+                    '${timerTime.inHours.toString().padLeft(2, "0")}:${timerTime.inMinutes.toString().padLeft(2, "0")}:${timerTime.inSeconds.remainder(60).toString().padLeft(2, "0")}',
+                    style: TextStyle(color: Colors.white),
+                  )
                       : Text(
-                      '${breakTimerTime.inHours.toString().padLeft(2, "0")}:${breakTimerTime.inMinutes.toString().padLeft(2, "0")}:${breakTimerTime.inSeconds.remainder(60).toString().padLeft(2, "0")}'),
+                    '${breakTimerTime.inHours.toString().padLeft(2, "0")}:${breakTimerTime.inMinutes.toString().padLeft(2, "0")}:${breakTimerTime.inSeconds.remainder(60).toString().padLeft(2, "0")}',
+                    style: TextStyle(color: Colors.white),
+                  ),
                 ],
               ),
             ),
@@ -261,8 +264,11 @@ class _MoneyTimerWidgetState extends State<MoneyTimerWidget> {
             'Specify your focus, break and repeat set on the fields.',
             textAlign: TextAlign.start,
           ),
+          const SizedBox(
+            height: 10,
+          ),
           const Text(
-            'Earn money based on how long you focus for. (Money=Total focus time/2)',
+            'Enabling the strict mode option restricts you from pausing the timer once it starts.',
             textAlign: TextAlign.start,
           ),
           const SizedBox(

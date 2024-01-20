@@ -77,7 +77,7 @@ class _ChallengeListScreenState extends State<ChallengeListScreen> {
       });
       AppResponse.showAlertBottomSheet(
           title: 'Request Sent',
-          message: "Request sent successful",
+          message: "Request sent successfully",
           context: context,
           color: Colors.green);
     }).catchError((onError) {
@@ -103,7 +103,29 @@ class _ChallengeListScreenState extends State<ChallengeListScreen> {
             final challenge = snapshot.data!;
 
             return ListView(
-              children: challenge.map(buildChallenge).toList(),
+              children: <Widget>[
+                const SizedBox(
+                  height: 20,
+                ),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                  child: Text(
+                    'People you send and receive challenges from appear here.',
+                    style: TextStyle(fontSize: 18.0),
+                  ),
+                ),
+                const SizedBox(
+                  height: 10,
+                ),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                  child: Text(
+                    "Let's compete in challenges to earn points and win!",
+                    style: TextStyle(fontSize: 18.0),
+                  ),
+                ),
+                ...challenge.map(buildChallenge).toList(),
+              ],
             );
           } else {
             return const Center(child: CircularProgressIndicator());
@@ -118,7 +140,11 @@ class _ChallengeListScreenState extends State<ChallengeListScreen> {
         Expanded(
           child: ListTile(
             title: Text(challenge.acceptorDisplayName),
-            subtitle: Text(challenge.acceptorEmail),
+            subtitle: Text(
+              challenge.acceptorEmail == FirebaseAuth.instance.currentUser!.email
+                  ? challenge.requesterEmail
+                  : challenge.acceptorEmail,
+            ),
           ),
         ),
         challenge.status == "accepted"
@@ -135,15 +161,16 @@ class _ChallengeListScreenState extends State<ChallengeListScreen> {
             : challenge.status == "request" &&
             challenge.acceptorEmail ==
                 FirebaseAuth.instance.currentUser!.email
-            ? TextButton(
+            ? OutlinedButton(
           onPressed: () {
             _acceptChallenge(challenge.id);
           },
-          style: ButtonStyle(
-            foregroundColor:
-            MaterialStateProperty.all(Colors.white),
-            backgroundColor:
-            MaterialStateProperty.all(Colors.blue),
+          style: OutlinedButton.styleFrom(
+            foregroundColor: Colors.white,
+            backgroundColor: Colors.blue,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(5), // Adjust corner radius here
+            ),
           ),
           child: const Text('Accept'),
         )
@@ -154,7 +181,7 @@ class _ChallengeListScreenState extends State<ChallengeListScreen> {
           padding: const EdgeInsets.all(5.0),
           decoration: BoxDecoration(
               color: Colors.grey,
-              borderRadius: BorderRadius.circular(20)),
+              borderRadius: BorderRadius.circular(0)),
           child: const Center(
               child: Text(
                 'Done',
@@ -168,15 +195,15 @@ class _ChallengeListScreenState extends State<ChallengeListScreen> {
           padding: const EdgeInsets.all(5.0),
           decoration: BoxDecoration(
               color: Colors.grey,
-              borderRadius: BorderRadius.circular(20)),
+              borderRadius: BorderRadius.circular(0)),
           child: const Center(
               child: Text(
-                'Done',
+                'Finished',
                 style: TextStyle(color: Colors.white),
               )),
         )
             : challenge.status == "started"
-            ? TextButton(
+            ? OutlinedButton(
           onPressed: () {
             Navigator.push(
                 context,
@@ -185,13 +212,12 @@ class _ChallengeListScreenState extends State<ChallengeListScreen> {
                         ChallengeTimerWidget(
                             challenge: challenge)));
           },
-          style: ButtonStyle(
-            foregroundColor:
-            MaterialStateProperty.all(
-                Colors.white),
-            backgroundColor:
-            MaterialStateProperty.all(
-                Styles.pomodoroPrimaryColor),
+          style: OutlinedButton.styleFrom(
+            foregroundColor: Colors.white,
+            backgroundColor: Styles.pomodoroPrimaryColor,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(5), // Adjust corner radius here
+            ),
           ),
           child: const Text('Open'),
         )
@@ -203,9 +229,8 @@ class _ChallengeListScreenState extends State<ChallengeListScreen> {
               BorderRadius.circular(20)),
           child: Center(
               child: Text(
-                challenge.status,
-                style:
-                const TextStyle(color: Colors.white),
+                challenge.status == "request" ? "Requested" : challenge.status,
+                style: const TextStyle(color: Colors.white),
               )),
         )
       ],

@@ -1,13 +1,13 @@
 class AuthUser {
+  DateTime createdAt;
   String? id;
+  bool isActive;
   String displayName;
   String photoURL;
   String email;
-  bool isActive;
   double myPoints;
   double myMoney;
-  String badge;
-  DateTime createdAt;
+  String? myBadge;
 
   AuthUser(
       {required this.createdAt,
@@ -18,8 +18,7 @@ class AuthUser {
         required this.photoURL,
         required this.myPoints,
         required this.myMoney,
-        required this.badge
-      });
+        this.myBadge});
 
   toJson() => {
     "displayName": displayName,
@@ -29,17 +28,16 @@ class AuthUser {
     "myPoints": myPoints,
     "myMoney": myMoney,
     "photoURL": photoURL,
-    "myBadge": badge
+    "myBadge": myBadge,
   };
 
   factory AuthUser.fromJson(Map<String, dynamic> json) => AuthUser(
       createdAt: DateTime.now(),
       isActive: json["isActive"],
-      myPoints: double.parse(json["myPoints"].toString()),
-      myMoney: double.parse(json["myMoney"].toString()),
+      myPoints: json["myPoints"],
+      myMoney: json["myMoney"],
       email: json["email"],
       photoURL: json["photoURL"],
       displayName: json["displayName"],
-      badge: json["badge"]
-  );
+      myBadge: json["myBadge"]);
 }

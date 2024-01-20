@@ -240,7 +240,10 @@ class _ChallengeTimerWidgetState extends State<ChallengeTimerWidget> {
     return Scaffold(
       appBar: AppBar(
           backgroundColor: Styles.pomodoroPrimaryColor,
-          title: const Text('Pomodoro Challenge')),
+          title: const Text('Pomodoro Challenge',
+              style: TextStyle(color:Colors.white,)
+          ),
+      ),
       body: SingleChildScrollView(
           child: Padding(
             padding: const EdgeInsets.all(8.0),

@@ -4,8 +4,7 @@ import 'onlineusers.dart';
 import 'package:pomo_rush/utils/preferences.dart';
 import 'home.dart';
 import 'leaderboard.dart';
-import 'package:pomo_rush/screens/moneytimer.dart';
-import 'store.dart';
+import '../models/store.dart';
 import 'store_screen.dart';
 
 class Menu extends StatefulWidget {
@@ -18,7 +17,7 @@ class Menu extends StatefulWidget {
 class _MenuState extends State<Menu> {
   int _selectedIndex = 0;
 
-  String title = "PomoGame";
+  String title = "PomoRush";
 
   // Create an instance of the Store class
   late final Store _store;
@@ -33,7 +32,6 @@ class _MenuState extends State<Menu> {
 
     _pages = [
       const WelcomePage(),
-      const MoneyTimerWidget(),
       StoreScreen(store: _store),
       const OnlineActiveUsers(),
       const LeaderBoard(),
@@ -54,29 +52,23 @@ class _MenuState extends State<Menu> {
 
         case 1:
           setState(() {
-            title = "Money Earning Timer";
+            title = "Store";
           });
           break;
 
         case 2:
           setState(() {
-            title = "Store";
+            title = "Users";
           });
           break;
 
         case 3:
           setState(() {
-            title = "Users";
+            title = "Ranking";
           });
           break;
 
         case 4:
-          setState(() {
-            title = "Leaderboard";
-          });
-          break;
-
-        case 5:
           setState(() {
             title = "Challenge List";
           });
@@ -84,7 +76,7 @@ class _MenuState extends State<Menu> {
 
         default:
           setState(() {
-            title = "PomoGame";
+            title = "Welcome to POMORUSH";
           });
           break;
       }
@@ -97,7 +89,9 @@ class _MenuState extends State<Menu> {
       body: _pages[_selectedIndex],
       appBar: AppBar(
         backgroundColor: Styles.pomodoroPrimaryColor,
-        title: Text(title),
+        title: Text(title,
+            style: TextStyle(color:Colors.white,)
+        ),
       ),
       bottomNavigationBar: BottomNavigationBar(
         backgroundColor: Styles.pomodoroPrimaryColor,
@@ -110,20 +104,16 @@ class _MenuState extends State<Menu> {
             label: 'Home',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.attach_money),
-            label: 'Money',
-          ),
-          BottomNavigationBarItem(
             icon: Icon(Icons.local_grocery_store),
             label: 'Store',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.timer),
+            icon: Icon(Icons.people),
             label: 'Users',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.assessment),
-            label: 'Leaderboard',
+            label: 'Rank',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.compare_arrows),

@@ -16,7 +16,7 @@ class _LeaderBoardState extends State<LeaderBoard> {
 
   @override
   Widget build(BuildContext context) {
-    var r = const TextStyle(color: Colors.purpleAccent, fontSize: 34);
+    var r = const TextStyle(color: Colors.black, fontSize: 34);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -25,26 +25,12 @@ class _LeaderBoardState extends State<LeaderBoard> {
           margin: const EdgeInsets.only(left: 15.0, top: 10.0),
           child: RichText(
               text: const TextSpan(
-                  text: "Leader",
+                  text: "Leader Board",
                   style: TextStyle(
-                      color: Colors.deepPurple,
+                      color: Colors.black,
                       fontSize: 30.0,
                       fontWeight: FontWeight.bold),
-                  children: [
-                    TextSpan(
-                        text: " Board",
-                        style: TextStyle(
-                            color: Colors.pink,
-                            fontSize: 30.0,
-                            fontWeight: FontWeight.bold))
-                  ])),
-        ),
-        const Padding(
-          padding: EdgeInsets.only(left: 15.0),
-          child: Text(
-            'Global Rank Board: ',
-            style: TextStyle(fontWeight: FontWeight.bold),
-          ),
+                  )),
         ),
         Flexible(
             child: StreamBuilder<QuerySnapshot>(
@@ -90,7 +76,7 @@ class _LeaderBoardState extends State<LeaderBoard> {
                                       children: <Widget>[
                                         Padding(
                                           padding: const EdgeInsets.only(
-                                              top: 10.0, left: 15.0),
+                                              left: 15.0),
                                           child: Row(
                                             children: <Widget>[
                                               CircleAvatar(
@@ -112,7 +98,7 @@ class _LeaderBoardState extends State<LeaderBoard> {
                                         ),
                                         Padding(
                                           padding: const EdgeInsets.only(
-                                              left: 20.0, top: 10.0),
+                                              left: 20.0),
                                           child: Column(
                                             mainAxisAlignment:
                                             MainAxisAlignment.center,
@@ -127,9 +113,9 @@ class _LeaderBoardState extends State<LeaderBoard> {
                                                     ['displayName'],
                                                     style: const TextStyle(
                                                         color:
-                                                        Colors.deepPurple,
+                                                        Colors.black,
                                                         fontWeight:
-                                                        FontWeight.w500),
+                                                        FontWeight.w800),
                                                     maxLines: 6,
                                                   )),
                                               Text(
@@ -151,21 +137,6 @@ class _LeaderBoardState extends State<LeaderBoard> {
                                           style: r,
                                         )
                                             : const Text(''),
-                                        Padding(
-                                          padding: const EdgeInsets.only(
-                                              left: 20.0,
-                                              top: 13.0,
-                                              right: 20.0),
-                                          child: TextButton(
-                                              onPressed: () {},
-                                              child: const Text(
-                                                "Challenge",
-                                                style: TextStyle(
-                                                    color: Colors.white,
-                                                    fontWeight:
-                                                    FontWeight.bold),
-                                              )),
-                                        ),
                                       ],
                                     ),
                                   ],

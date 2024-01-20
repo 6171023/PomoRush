@@ -18,8 +18,12 @@ class _TimerSettingsScreenState extends State<TimerSettingsScreen> {
         appBar: AppBar(
           backgroundColor: Styles.pomodoroPrimaryColor,
           title: widget.isChallenge
-              ? const Text('Pomodoro Challenge')
-              : const Text('Pomodoro Timer'),
+              ? Text('Pomodoro Challenge Timer', style: TextStyle(color: Colors.white))
+              : Text('Pomodoro Timer', style: TextStyle(color: Colors.white)),
+          leading: IconButton(
+            icon: Icon(Icons.arrow_back, color: Colors.white), // Custom back button
+            onPressed: () => Navigator.pop(context),
+          ),
         ),
         body: const SingleChildScrollView(
             child: Padding(

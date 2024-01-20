@@ -53,8 +53,8 @@ class _PersonalTimerWidgetState extends State<PersonalTimerWidget> {
       _timer = Timer.periodic(const Duration(seconds: 1), (timer) async {
         if (timerTime.inSeconds <= 0) {
           timer.cancel();
-          await _recordPointAfterCompleteOneSet(
-              double.parse(focusMinutes.text));
+          // await _recordPointAfterCompleteOneSet(
+          //     double.parse(focusMinutes.text));
           //decrease the set count
           if (sets.text.isNotEmpty) {
             //check if the set still active
@@ -198,26 +198,6 @@ class _PersonalTimerWidgetState extends State<PersonalTimerWidget> {
     });
   }
 
-  _recordPointAfterCompleteOneSet(double points) async {
-    CollectionReference users = FirebaseFirestore.instance.collection('users');
-    await users
-        .where('email', isEqualTo: FirebaseAuth.instance.currentUser!.email)
-        .get()
-        .then((value) async {
-
-      if (value.docs.isNotEmpty) {
-        double currentPoints =
-            double.parse(value.docs.first["myPoints"].toString()) + points;
-        await users
-            .doc(value.docs.first.id)
-            .update({"myPoints": currentPoints})
-            .then((value) {})
-            .catchError((error) {});
-      }
-    });
-  }
-
-
   @override
   void initState() {
     _readLastTimerCount();
@@ -244,22 +224,34 @@ class _PersonalTimerWidgetState extends State<PersonalTimerWidget> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  isFocus ? const Text('Focus') : const Text('Break'),
+                  isFocus ? const Text('Focus', style: TextStyle(color: Colors.white)) : const Text('Break', style: TextStyle(color: Colors.white)),
                   const SizedBox(height: 5),
                   isFocus
                       ? Text(
-                      '${timerTime.inHours.toString().padLeft(2, "0")}:${timerTime.inMinutes.toString().padLeft(2, "0")}:${timerTime.inSeconds.remainder(60).toString().padLeft(2, "0")}')
+                    '${timerTime.inHours.toString().padLeft(2, "0")}:${timerTime.inMinutes.toString().padLeft(2, "0")}:${timerTime.inSeconds.remainder(60).toString().padLeft(2, "0")}',
+                    style: TextStyle(color: Colors.white),
+                  )
                       : Text(
-                      '${breakTimerTime.inHours.toString().padLeft(2, "0")}:${breakTimerTime.inMinutes.toString().padLeft(2, "0")}:${breakTimerTime.inSeconds.remainder(60).toString().padLeft(2, "0")}'),
+                    '${breakTimerTime.inHours.toString().padLeft(2, "0")}:${breakTimerTime.inMinutes.toString().padLeft(2, "0")}:${breakTimerTime.inSeconds.remainder(60).toString().padLeft(2, "0")}',
+                    style: TextStyle(color: Colors.white),
+                  ),
                 ],
               ),
             ),
           ),
+
           const SizedBox(
             height: 10,
           ),
           const Text(
             'Specify your focus, break and repeat set on the fields.',
+            textAlign: TextAlign.start,
+          ),
+          const SizedBox(
+            height: 10,
+          ),
+          const Text(
+            'The strict mode option, if enabled, restricts you from pausing the timer once it starts.',
             textAlign: TextAlign.start,
           ),
           const SizedBox(

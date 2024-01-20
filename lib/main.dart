@@ -8,9 +8,7 @@ import 'screens/login.dart';
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
-
   await Firebase.initializeApp();
-
   runApp(const MyApp());
 }
 

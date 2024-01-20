@@ -15,7 +15,10 @@ class LoginPage extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Styles.pomodoroPrimaryColor,
-        title: const Text('POMOGAME'),
+        title: Text("POMORUSH",
+          style: TextStyle(color: Colors.white,
+        ),
+        ),
       ),
       body: Center(
           child: Column(
@@ -67,6 +70,7 @@ class GoogleAuthService {
       var loginUser = {
         "myPoints": 0.0,
         "myMoney": 0.0,
+        "myBadge": "None",
         "displayName": FirebaseAuth.instance.currentUser!.displayName,
         "isActive": true,
         "email": FirebaseAuth.instance.currentUser!.email,
