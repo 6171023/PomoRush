@@ -1,0 +1,46 @@
+{
+  "project_info": {
+    "project_number": "569132470381",
+    "project_id": "pomorush",
+    "storage_bucket": "pomorush.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:569132470381:android:dd513fd3385a439e1eef64",
+        "android_client_info": {
+          "package_name": "com.pomo.rush"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "569132470381-b4ik2ne43paadke4j7hv5hrh40hnmv9f.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC9P1RdCzZvg2LzpzERONtV1UrUoY_w438"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "569132470381-b4ik2ne43paadke4j7hv5hrh40hnmv9f.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "569132470381-c5vcm1n4pr101v6d1ado7705qmlcefac.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.pomo.rush"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
