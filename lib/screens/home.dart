@@ -31,7 +31,8 @@ class _WelcomePageState extends State<WelcomePage> {
         photoURL: '',
         myPoints: 0.0,
         myMoney: 0.0,
-        myBadge: 'None'
+        myBadge: 'None',
+        purchasedBadges: []
       ));
 
   @override

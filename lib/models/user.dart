@@ -8,6 +8,7 @@ class AuthUser {
   double myPoints;
   double myMoney;
   String? myBadge;
+  List<String> purchasedBadges;
 
   AuthUser(
       {required this.createdAt,
@@ -18,7 +19,9 @@ class AuthUser {
         required this.photoURL,
         required this.myPoints,
         required this.myMoney,
-        this.myBadge});
+        required this.purchasedBadges,
+        required this.myBadge
+      });
 
   toJson() => {
     "displayName": displayName,
@@ -29,15 +32,18 @@ class AuthUser {
     "myMoney": myMoney,
     "photoURL": photoURL,
     "myBadge": myBadge,
+    "BadgeList": purchasedBadges
   };
 
   factory AuthUser.fromJson(Map<String, dynamic> json) => AuthUser(
       createdAt: DateTime.now(),
       isActive: json["isActive"],
+      email: json["email"],
+      displayName: json["displayName"],
+      photoURL: json["photoURL"],
       myPoints: json["myPoints"],
       myMoney: json["myMoney"],
-      email: json["email"],
-      photoURL: json["photoURL"],
-      displayName: json["displayName"],
-      myBadge: json["myBadge"]);
+      myBadge: json["myBadge"],
+      purchasedBadges: List<String>.from(json["BadgeList"] ?? []),
+  );
 }

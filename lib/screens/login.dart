@@ -71,6 +71,7 @@ class GoogleAuthService {
         "myPoints": 0.0,
         "myMoney": 0.0,
         "myBadge": "None",
+        "BadgeList": [],
         "displayName": FirebaseAuth.instance.currentUser!.displayName,
         "isActive": true,
         "email": FirebaseAuth.instance.currentUser!.email,
@@ -118,4 +119,10 @@ class GoogleAuthService {
       }
     });
   }
+
+  // signOut() async {
+  //   await FirebaseAuth.instance.signOut();
+  // }
+
+
 }

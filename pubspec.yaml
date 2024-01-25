@@ -49,6 +49,8 @@ dependencies:
   #local storage Package
   flutter_secure_storage: ^8.0.0
 
+  in_app_purchase: ^3.1.13
+
 dev_dependencies:
   flutter_test:
     sdk: flutter

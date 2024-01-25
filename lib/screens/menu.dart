@@ -20,7 +20,7 @@ class _MenuState extends State<Menu> {
   String title = "PomoRush";
 
   // Create an instance of the Store class
-  late final Store _store;
+  late final Store store;
 
   late final List<Widget> _pages;
 
@@ -28,11 +28,11 @@ class _MenuState extends State<Menu> {
   void initState() {
     super.initState();
 
-    _store = Store();
+    store = Store();
 
     _pages = [
       const WelcomePage(),
-      StoreScreen(store: _store),
+      StoreScreen(store: store,),
       const OnlineActiveUsers(),
       const LeaderBoard(),
       const ChallengeListScreen()
