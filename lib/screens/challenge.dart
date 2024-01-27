@@ -111,7 +111,7 @@ class _ChallengeListScreenState extends State<ChallengeListScreen> {
                   padding: const EdgeInsets.symmetric(horizontal: 16.0),
                   child: Text(
                     'People you send and receive challenges from appear here.',
-                    style: TextStyle(fontSize: 18.0),
+                    style: TextStyle(fontSize: 15.0),
                   ),
                 ),
                 const SizedBox(
@@ -121,7 +121,7 @@ class _ChallengeListScreenState extends State<ChallengeListScreen> {
                   padding: const EdgeInsets.symmetric(horizontal: 16.0),
                   child: Text(
                     "Let's compete in challenges to earn points and win!",
-                    style: TextStyle(fontSize: 18.0),
+                    style: TextStyle(fontSize: 15.0),
                   ),
                 ),
                 ...challenge.map(buildChallenge).toList(),
@@ -155,6 +155,11 @@ class _ChallengeListScreenState extends State<ChallengeListScreen> {
           style: ButtonStyle(
             foregroundColor: MaterialStateProperty.all(Colors.white),
             backgroundColor: MaterialStateProperty.all(Colors.green),
+            shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+              RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(5),
+              ),
+            ),
           ),
           child: const Text('Start'),
         )
@@ -169,7 +174,7 @@ class _ChallengeListScreenState extends State<ChallengeListScreen> {
             foregroundColor: Colors.white,
             backgroundColor: Colors.blue,
             shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(5), // Adjust corner radius here
+              borderRadius: BorderRadius.circular(5),
             ),
           ),
           child: const Text('Accept'),
@@ -181,11 +186,11 @@ class _ChallengeListScreenState extends State<ChallengeListScreen> {
           padding: const EdgeInsets.all(5.0),
           decoration: BoxDecoration(
               color: Colors.grey,
-              borderRadius: BorderRadius.circular(0)),
+              borderRadius: BorderRadius.circular(20)),
           child: const Center(
               child: Text(
-                'Done',
-                style: TextStyle(color: Colors.white),
+                ' Finished ',
+                style: TextStyle(color: Colors.black),
               )),
         )
             : challenge.requesterEmail ==
@@ -195,11 +200,11 @@ class _ChallengeListScreenState extends State<ChallengeListScreen> {
           padding: const EdgeInsets.all(5.0),
           decoration: BoxDecoration(
               color: Colors.grey,
-              borderRadius: BorderRadius.circular(0)),
+              borderRadius: BorderRadius.circular(20)),
           child: const Center(
               child: Text(
-                'Finished',
-                style: TextStyle(color: Colors.white),
+                ' Finished ', //when both parties finish the challenge
+                style: TextStyle(color: Colors.black),
               )),
         )
             : challenge.status == "started"
@@ -229,7 +234,7 @@ class _ChallengeListScreenState extends State<ChallengeListScreen> {
               BorderRadius.circular(20)),
           child: Center(
               child: Text(
-                challenge.status == "request" ? "Requested" : challenge.status,
+                challenge.status == "request" ? " Requested " : challenge.status,
                 style: const TextStyle(color: Colors.white),
               )),
         )

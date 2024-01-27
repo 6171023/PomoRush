@@ -1,9 +1,5 @@
-// ignore_for_file: file_names
-
 import 'dart:async';
 import 'dart:convert';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:pomo_rush/utils/preferences.dart';
 import 'package:pomo_rush/utils/utils.dart';
@@ -157,50 +153,14 @@ class _PersonalTimerWidgetState extends State<PersonalTimerWidget> {
     } catch (_) {}
   }
 
-  _readLastTimerCount() async {
-    await AppStorage.readDataFromSecureStorage(key: 'timers')
-        .then((timerCount) {
-      var lastTimer = jsonDecode(timerCount!);
-
-      if (lastTimer != null) {
-        timerTime = Duration(
-            hours: int.parse(lastTimer["focusTimer"].toString().split(":")[0]),
-            minutes:
-            int.parse(lastTimer["focusTimer"].toString().split(":")[1]),
-            seconds: int.parse(lastTimer["focusTimer"]
-                .toString()
-                .split(":")[2]
-                .split(".")[0]));
-        breakTimerTime = Duration(
-            hours: int.parse(lastTimer["breakTimer"].toString().split(":")[0]),
-            minutes:
-            int.parse(lastTimer["breakTimer"].toString().split(":")[1]),
-            seconds: int.parse(lastTimer["breakTimer"]
-                .toString()
-                .split(":")[2]
-                .split(".")[0]));
-        focusMinutes = TextEditingController(
-            text: lastTimer["focusTimer"].toString().split(":")[1]);
-        breaktime = TextEditingController(
-            text: lastTimer["breakTimer"].toString().split(":")[1]);
-        sets = TextEditingController(text: lastTimer["sets"].toString());
-        strictIsActive = lastTimer["strictMode"];
-        isFocus = lastTimer["focus"];
-
-        if (lastTimer["timerIsActive"]) {
-          _startFocusTimer();
-        } else if (lastTimer["breakTimerIsActive"]) {
-          _startBreakTimer();
-        } else {
-          setState(() {});
-        }
-      }
-    });
-  }
 
   @override
   void initState() {
-    _readLastTimerCount();
+    isFocus = true;
+    focusMinutes.text = "25";
+    breaktime.text = "5";
+    sets.text = "4";
+    breakTimerTime = Duration(minutes: 25); // Update breakTimerTime to 25 minutes
     super.initState();
   }
 
@@ -224,16 +184,16 @@ class _PersonalTimerWidgetState extends State<PersonalTimerWidget> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  isFocus ? const Text('Focus', style: TextStyle(color: Colors.white)) : const Text('Break', style: TextStyle(color: Colors.white)),
+                  isFocus ? const Text('Focus', style: TextStyle(color: Colors.greenAccent, fontSize: 25.0)) : const Text('Break', style: TextStyle(color: Colors.limeAccent, fontSize: 25.0)),
                   const SizedBox(height: 5),
                   isFocus
                       ? Text(
                     '${timerTime.inHours.toString().padLeft(2, "0")}:${timerTime.inMinutes.toString().padLeft(2, "0")}:${timerTime.inSeconds.remainder(60).toString().padLeft(2, "0")}',
-                    style: TextStyle(color: Colors.white),
+                    style: TextStyle(color: Colors.greenAccent, fontSize: 35.0),
                   )
                       : Text(
                     '${breakTimerTime.inHours.toString().padLeft(2, "0")}:${breakTimerTime.inMinutes.toString().padLeft(2, "0")}:${breakTimerTime.inSeconds.remainder(60).toString().padLeft(2, "0")}',
-                    style: TextStyle(color: Colors.white),
+                    style: TextStyle(color: Colors.limeAccent, fontSize: 35.0),
                   ),
                 ],
               ),

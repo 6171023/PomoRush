@@ -67,7 +67,7 @@ class _OnlineActiveUsersState extends State<OnlineActiveUsers> {
 
       AppResponse.showAlertBottomSheet(
           title: 'Request Sent',
-          message: "Request sent successful",
+          message: "Request sent successfully",
           context: context,
           color: Colors.green);
     }).catchError((error) {
@@ -276,6 +276,7 @@ class _OnlineActiveUsersState extends State<OnlineActiveUsers> {
                 title: Row(
                   children: [
                     Text(user.displayName),
+                    SizedBox(width: 5),
                     user.email == FirebaseAuth.instance.currentUser!.email
                         ? Container(
                       padding: const EdgeInsets.only(
@@ -287,16 +288,49 @@ class _OnlineActiveUsersState extends State<OnlineActiveUsers> {
                           color: Styles.pomodoroPrimaryColor,
                           borderRadius: BorderRadius.circular(20)),
                       child: const Center(
-                          child: Text(
+                          child:
+                          Text(
                             'You',
                             style: TextStyle(
-                                fontSize: 10.0, color: Colors.white),
+                                fontSize: 12.0, color: Colors.white),
                           )),
                     )
                         : Container()
                   ],
                 ),
-                subtitle: Text(user.email),
+                subtitle:
+                Container(
+                  alignment: Alignment.centerLeft,
+                  child: Column(
+                    children: [
+                      user.myBadgeImagePath != null
+                          ? Row(
+                        children: [
+                          Text(
+                            'Badge: ',
+                            style: TextStyle(
+                              fontSize: 15,
+                              color: Styles.pomodoroPrimaryColor,
+                            ),
+                          ),
+                          Image.asset(
+                            user.myBadgeImagePath!,
+                            width: 30,
+                            height: 30,
+                          ),
+                        ],
+                      )
+                          : Text(
+                        'Badge: ${user.myBadge}',
+                        style: TextStyle(
+                          fontSize: 15,
+                          color: Styles.pomodoroPrimaryColor,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+
               ),
             ),
             user.email == FirebaseAuth.instance.currentUser!.email
@@ -313,10 +347,19 @@ class _OnlineActiveUsersState extends State<OnlineActiveUsers> {
                 _showSetTimerDialog();
               },
               style: ButtonStyle(
-                foregroundColor:
-                MaterialStateProperty.all(Colors.white),
-                backgroundColor: MaterialStateProperty.all(
-                    Styles.pomodoroPrimaryColor),
+                minimumSize: MaterialStateProperty.all(
+                    Size(MediaQuery
+                        .of(context)
+                        .size
+                        .width/4, 40)),
+                shape: MaterialStateProperty.all(
+                  RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(5),
+                  ),
+                ),
+                foregroundColor: MaterialStateProperty.all(Colors.white),
+                backgroundColor:
+                MaterialStateProperty.all(Styles.pomodoroPrimaryColor),
               ),
               child: const Text('Request'),
             )

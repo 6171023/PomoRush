@@ -5,7 +5,6 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:pomo_rush/utils/preferences.dart';
 import 'package:pomo_rush/utils/utils.dart';
-import 'package:pomo_rush/screens/timerSettingScreen.dart';
 
 class MoneyTimerWidget extends StatefulWidget {
   const MoneyTimerWidget({super.key});
@@ -216,9 +215,12 @@ class _MoneyTimerWidgetState extends State<MoneyTimerWidget> {
     });
   }
 
-  @override
   void initState() {
-    _readLastTimerCount();
+    isFocus = true;
+    focusMinutes.text = "25";
+    breaktime.text = "5";
+    sets.text = "4";
+    breakTimerTime = Duration(minutes: 25); // Update breakTimerTime to 25 minutes
     super.initState();
   }
 
@@ -242,16 +244,16 @@ class _MoneyTimerWidgetState extends State<MoneyTimerWidget> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  isFocus ? const Text('Focus', style: TextStyle(color: Colors.white)) : const Text('Break', style: TextStyle(color: Colors.white)),
+                  isFocus ? const Text('Focus', style: TextStyle(color: Colors.greenAccent, fontSize: 25.0)) : const Text('Break', style: TextStyle(color: Colors.limeAccent, fontSize: 25.0)),
                   const SizedBox(height: 5),
                   isFocus
                       ? Text(
                     '${timerTime.inHours.toString().padLeft(2, "0")}:${timerTime.inMinutes.toString().padLeft(2, "0")}:${timerTime.inSeconds.remainder(60).toString().padLeft(2, "0")}',
-                    style: TextStyle(color: Colors.white),
+                    style: TextStyle(color: Colors.greenAccent, fontSize: 35.0),
                   )
                       : Text(
                     '${breakTimerTime.inHours.toString().padLeft(2, "0")}:${breakTimerTime.inMinutes.toString().padLeft(2, "0")}:${breakTimerTime.inSeconds.remainder(60).toString().padLeft(2, "0")}',
-                    style: TextStyle(color: Colors.white),
+                    style: TextStyle(color: Colors.limeAccent, fontSize: 35.0),
                   ),
                 ],
               ),

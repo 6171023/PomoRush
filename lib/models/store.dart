@@ -4,12 +4,14 @@ import 'package:firebase_auth/firebase_auth.dart';
 class StoreBadge {
   final String name;
   final double price;
+  final String imagePath;
   bool isEquipped;
   bool isPurchased;
 
   StoreBadge({
     required this.name,
     required this.price,
+    required this.imagePath,
     this.isEquipped = false,
     this.isPurchased = false,
   });
@@ -18,6 +20,7 @@ class StoreBadge {
     return StoreBadge(
       name: map['name'],
       price: map['price'].toDouble(),
+      imagePath: map['image'],
       isEquipped: map['isEquipped'] ?? false,
       isPurchased: map['isPurchased'] != null && map['isPurchased']['_seconds'] > 0,
     );
@@ -28,7 +31,6 @@ class StoreBadge {
 class Store {
   late List<StoreBadge> _availableBadges;
   late List<StoreBadge> _userBadges;
-  List<String> _userPurchasedBadgeIds = [];
 
   Store() {
     _initializeAvailableBadges();
@@ -38,10 +40,12 @@ class Store {
 
   void _initializeAvailableBadges() {
     _availableBadges = [
-      StoreBadge(name: 'Badge 1', price: 1.0),
-      StoreBadge(name: 'Badge 2', price: 2.0),
-      StoreBadge(name: 'Badge 3', price: 3.0),
-      // Add more badges as needed
+      StoreBadge(name: 'Badge 1', price: 1.0, imagePath: 'assets/coin.png'),
+      StoreBadge(name: 'Badge 2', price: 2.0, imagePath: 'assets/goen.png'),
+      StoreBadge(name: 'Badge 3', price: 3.0, imagePath: 'assets/coin.png'),
+      StoreBadge(name: 'Badge 4', price: 4.0, imagePath: 'assets/coin.png'),
+      // StoreBadge(name: 'Badge 5', price: 5.0),
+      // StoreBadge(name: 'Badge 6', price: 6.0),
     ];
   }
 
@@ -66,16 +70,24 @@ class Store {
           if (badgeList.contains(badge.name)) {
             _userBadges.add(badge);
             badge.isPurchased = true;
+            // Get the isEquipped field from Firestore
+            badge.isEquipped = data['BadgeList'][badge.name]['isEquipped'];
             if (badge.name == myBadge) {
               badge.isEquipped = true;
+            } else {
+              badge.isEquipped = false;
             }
+          }
+          else {
+            badge.isPurchased = false;
           }
         }
 
         // Update _availableBadges based on Firebase data
         for (var badge in _userBadges) {
-          if (!badgeList.contains(badge.name)) {
-            // If the badge is not in BadgeList, mark it as not purchased
+          if (badgeList.contains(badge.name)) {
+            badge.isPurchased = true;
+          } else if (!badgeList.contains(badge.name)) {
             badge.isPurchased = false;
           }
         }
@@ -88,7 +100,6 @@ class Store {
       print('Document does not exist.');
     }
   }
-
 
 
   List<StoreBadge> getAvailableBadges() {
@@ -118,9 +129,9 @@ class Store {
         });
       }
 
-      return true; // Indicate that the purchase was successful
+      return true;
     } else {
-      return false; // Indicate that the purchase failed
+      return false;
     }
   }
 
@@ -128,19 +139,32 @@ class Store {
 
   Future<void> equipBadge(StoreBadge badge) async {
     if (_userBadges.contains(badge)) {
+      // Unequip all badges first
+      for (var b in _userBadges) {
+        b.isEquipped = false;
+      }
+
+      // Then equip the selected badge
       badge.isEquipped = true;
-      badge.isPurchased = true;
-      // Update badge status in Firestore
+
+      // Determine the badge image path (or set it to null if no badge is equipped)
+      String? badgeImagePath = badge.isPurchased ? '${badge.imagePath}' : null;
+
+      // Update badge status and image path in Firestore
       CollectionReference users = FirebaseFirestore.instance.collection('users');
-      QuerySnapshot snapshot = await users.where('email', isEqualTo: FirebaseAuth.instance.currentUser!.email).get();
+      QuerySnapshot snapshot =
+      await users.where('email', isEqualTo: FirebaseAuth.instance.currentUser!.email).get();
       if (snapshot.docs.isNotEmpty) {
         await users.doc(snapshot.docs.first.id).update({
           "myBadge": badge.name,
-          "BadgeList": FieldValue.arrayUnion([badge.name])
+          "BadgeList": FieldValue.arrayUnion([badge.name]),
+          "myBadgeImagePath": badgeImagePath,
         });
       }
     }
   }
+
+
 
   Future<void> unequipBadge(StoreBadge badge) async {
     if (_userBadges.contains(badge)) {
@@ -152,6 +176,7 @@ class Store {
       if (snapshot.docs.isNotEmpty) {
         await users.doc(snapshot.docs.first.id).update({
           "myBadge": "None",
+          "myBadgeImagePath": null,
         });
       }
     }
@@ -190,6 +215,21 @@ class Store {
     });
   }
 
+  Stream<String?> fetchUserBadgeImage() {
+    CollectionReference users = FirebaseFirestore.instance.collection('users');
+    return users
+        .where('email', isEqualTo: FirebaseAuth.instance.currentUser!.email)
+        .snapshots()
+        .map((snapshot) {
+      if (snapshot.docs.isNotEmpty) {
+        var myBadge = snapshot.docs.first["myBadge"];
+        if (myBadge != "None") {
+          return snapshot.docs.first["myBadgeImagePath"].toString();
+        }
+      }
+      return "None";
+    });
+  }
 
 
   void _deductUserMoney(double amount) async {
@@ -201,7 +241,6 @@ class Store {
       }
     } catch (e) {
       print('Failed to deduct money: $e');
-      // Handle the error appropriately for your app
     }
   }
 }

@@ -9,6 +9,7 @@ class AuthUser {
   double myMoney;
   String? myBadge;
   List<String> purchasedBadges;
+  final String? myBadgeImagePath;
 
   AuthUser(
       {required this.createdAt,
@@ -20,7 +21,8 @@ class AuthUser {
         required this.myPoints,
         required this.myMoney,
         required this.purchasedBadges,
-        required this.myBadge
+        required this.myBadge,
+        this.myBadgeImagePath,
       });
 
   toJson() => {
@@ -44,6 +46,7 @@ class AuthUser {
       myPoints: json["myPoints"],
       myMoney: json["myMoney"],
       myBadge: json["myBadge"],
+      myBadgeImagePath: json['myBadgeImagePath'],
       purchasedBadges: List<String>.from(json["BadgeList"] ?? []),
   );
 }

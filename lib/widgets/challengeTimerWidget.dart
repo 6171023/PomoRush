@@ -71,7 +71,7 @@ class _ChallengeTimerWidgetState extends State<ChallengeTimerWidget> {
       }).then((value) {
         AppResponse.showAlertBottomSheet(
             title: 'Challenge Completed',
-            message: "Congratulations! You have passed the challenge.",
+            message: "Congratulations! You have completed the challenge.",
             context: context,
             color: Colors.green);
       }).catchError((onError) {});
@@ -243,6 +243,10 @@ class _ChallengeTimerWidgetState extends State<ChallengeTimerWidget> {
           title: const Text('Pomodoro Challenge',
               style: TextStyle(color:Colors.white,)
           ),
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back, color: Colors.white),
+          onPressed: () => Navigator.pop(context),
+        ),
       ),
       body: SingleChildScrollView(
           child: Padding(
@@ -274,13 +278,17 @@ class _ChallengeTimerWidgetState extends State<ChallengeTimerWidget> {
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        isFocus ? const Text('Focus') : const Text('Break'),
+                        isFocus ? const Text('Focus', style: TextStyle(color: Colors.greenAccent, fontSize: 25.0)) : const Text('Break', style: TextStyle(color: Colors.limeAccent, fontSize: 25.0)),
                         const SizedBox(height: 5),
                         isFocus
                             ? Text(
-                            '${timerTime.inHours.toString().padLeft(2, "0")}:${timerTime.inMinutes.toString().padLeft(2, "0")}:${timerTime.inSeconds.remainder(60).toString().padLeft(2, "0")}')
+                            '${timerTime.inHours.toString().padLeft(2, "0")}:${timerTime.inMinutes.toString().padLeft(2, "0")}:${timerTime.inSeconds.remainder(60).toString().padLeft(2, "0")}',
+                            style: TextStyle(color: Colors.greenAccent, fontSize: 35.0)
+                        )
                             : Text(
-                            '${breakTimerTime.inHours.toString().padLeft(2, "0")}:${breakTimerTime.inMinutes.toString().padLeft(2, "0")}:${breakTimerTime.inSeconds.remainder(60).toString().padLeft(2, "0")}'),
+                            '${breakTimerTime.inHours.toString().padLeft(2, "0")}:${breakTimerTime.inMinutes.toString().padLeft(2, "0")}:${breakTimerTime.inSeconds.remainder(60).toString().padLeft(2, "0")}',
+                            style: TextStyle(color: Colors.limeAccent, fontSize: 35.0)
+                        ),
                       ],
                     ),
                   ),
@@ -289,7 +297,7 @@ class _ChallengeTimerWidgetState extends State<ChallengeTimerWidget> {
                   height: 10,
                 ),
                 Text(
-                  'Sets Remained: ${widget.challenge.setCount.toString()}',
+                  'Sets Remaining: ${widget.challenge.setCount.toString()}',
                   style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
                 ),
                 const SizedBox(
@@ -362,12 +370,11 @@ class _ChallengeTimerWidgetState extends State<ChallengeTimerWidget> {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           FirebaseAuth.instance.currentUser!.email == chal.acceptorEmail
-              ? Text(chal.requesterCurrentState)
-              : Text(chal.acceptorCurrentState),
-          const SizedBox(height: 5),
+              ? Text(chal.requesterCurrentState, style: TextStyle(color: Colors.greenAccent, fontSize: 15.0))
+              : Text(chal.acceptorCurrentState, style: TextStyle(color: Colors.limeAccent, fontSize: 15.0)),
           FirebaseAuth.instance.currentUser!.email == chal.acceptorEmail
-              ? Text(chal.requesterCurrentTimer)
-              : Text(chal.acceptorCurrentTimer)
+              ? Text(chal.requesterCurrentTimer, style: TextStyle(color: Colors.greenAccent, fontSize: 25.0))
+              : Text(chal.acceptorCurrentTimer, style: TextStyle(color: Colors.limeAccent, fontSize: 25.0))
         ],
       ),
     ),

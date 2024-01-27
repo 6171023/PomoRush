@@ -32,7 +32,8 @@ class _WelcomePageState extends State<WelcomePage> {
         myPoints: 0.0,
         myMoney: 0.0,
         myBadge: 'None',
-        purchasedBadges: []
+        purchasedBadges: [],
+        myBadgeImagePath: null,
       ));
 
   @override
@@ -77,10 +78,10 @@ class _WelcomePageState extends State<WelcomePage> {
                       Size(MediaQuery
                           .of(context)
                           .size
-                          .width * 0.75, 40)), // Increase height here
+                          .width * 0.75, 40)),
                   shape: MaterialStateProperty.all(
                     RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(5), // Small curve on the sides
+                      borderRadius: BorderRadius.circular(5),
                     ),
                   ),
                   foregroundColor: MaterialStateProperty.all(Colors.white),
@@ -89,7 +90,7 @@ class _WelcomePageState extends State<WelcomePage> {
                 ),
                 child: const Text(
                   'Use the Pomodoro Timer',
-                  style: TextStyle(fontSize: 18), // Increase font size here
+                  style: TextStyle(fontSize: 18),
                 ),
               ),
             ],
@@ -98,11 +99,11 @@ class _WelcomePageState extends State<WelcomePage> {
         padding: EdgeInsets.only(bottom: 30, right: 128, left: 128),
         // Add bottom padding
         child: Container(
-          width: 100, // Specify width
-          height: 50, // Specify height
+          width: 100,
+          height: 50,
           decoration: BoxDecoration(
             color: Styles.pomodoroPrimaryColor,
-            borderRadius: BorderRadius.circular(30), // Rounded corners
+            borderRadius: BorderRadius.circular(30),
           ),
           child: TextButton(
             onPressed: () {
@@ -116,7 +117,7 @@ class _WelcomePageState extends State<WelcomePage> {
             ),
             child: const Text(
               'SIGN OUT',
-              style: TextStyle(fontSize: 18), // Adjust font size here
+              style: TextStyle(fontSize: 18),
             ),
           ),
         ),
@@ -158,7 +159,7 @@ class _WelcomePageState extends State<WelcomePage> {
               ),
               SizedBox(width: 8),
               Padding(
-                padding: const EdgeInsets.all(10.0), // Add margins here
+                padding: const EdgeInsets.all(10.0),
                 child: Column(
                   children: [
                     CoinFlip(money: user.myMoney),
@@ -174,13 +175,50 @@ class _WelcomePageState extends State<WelcomePage> {
               ),
             ],
           ),
-          Text(
-          'Currently equipped badge: ${user.myBadge}',
-          style: TextStyle(
-            fontSize: 20,
-            color: Styles.pomodoroPrimaryColor,
+          Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                user.myBadgeImagePath != null
+                    ? Center(
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        'Equipped badge: ',
+                        style: TextStyle(
+                          fontSize: 20,
+                          color: Styles.pomodoroPrimaryColor,
+                        ),
+                      ),
+                      Image.asset(
+                        user.myBadgeImagePath!,
+                        width: 50,
+                        height: 50,
+                      ),
+                      // SizedBox(width: 3,),
+                      // Text(
+                      //   '${user.myBadge}',
+                      //   style: TextStyle(
+                      //     fontSize: 20,
+                      //     color: Styles.pomodoroPrimaryColor,
+                      //   ),
+                      // ),
+                    ],
+                  ),
+                )
+                    : Text(
+                  'Equipped badge: ${user.myBadge}',
+                  style: TextStyle(
+                    fontSize: 20,
+                    color: Styles.pomodoroPrimaryColor,
+                  ),
+                ),
+              ],
+            ),
           ),
-          ),
+
+
         ],
       );
 }
