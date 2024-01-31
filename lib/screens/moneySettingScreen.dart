@@ -1,5 +1,3 @@
-// ignore_for_file: file_names
-
 import 'package:flutter/material.dart';
 import 'package:pomo_rush/utils/preferences.dart';
 import 'package:pomo_rush/widgets/moneytimer.dart';

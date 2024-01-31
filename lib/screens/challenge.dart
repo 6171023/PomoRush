@@ -19,9 +19,11 @@ class _ChallengeListScreenState extends State<ChallengeListScreen> {
       .collection('challenge')
       .snapshots()
       .map((snapshot) => snapshot.docs
+      .where((doc) => doc['acceptorEmail'] == FirebaseAuth.instance.currentUser!.email || doc['requesterEmail'] == FirebaseAuth.instance.currentUser!.email)
       .map((doc) => Challenge.fromJson(doc.data(), doc.id))
       .toList())
       .handleError((onError) {});
+
 
   late String acceptorEmail = '';
   late String acceptorName = '';
@@ -77,7 +79,7 @@ class _ChallengeListScreenState extends State<ChallengeListScreen> {
       });
       AppResponse.showAlertBottomSheet(
           title: 'Request Sent',
-          message: "Request sent successfully",
+          message: "Request sent successful",
           context: context,
           color: Colors.green);
     }).catchError((onError) {

@@ -205,7 +205,7 @@ class _MoneyTimerWidgetState extends State<MoneyTimerWidget> {
       if (value.docs.isNotEmpty) {
         double currentMoney =
         double.parse(value.docs.first["myMoney"].toString());
-        double updatedMoney = currentMoney + (money / 2); // Divide focus minutes by 2
+        double updatedMoney = currentMoney + (money / 2);
         await users
             .doc(value.docs.first.id)
             .update({"myMoney": updatedMoney})
@@ -220,7 +220,7 @@ class _MoneyTimerWidgetState extends State<MoneyTimerWidget> {
     focusMinutes.text = "25";
     breaktime.text = "5";
     sets.text = "4";
-    breakTimerTime = Duration(minutes: 25); // Update breakTimerTime to 25 minutes
+    breakTimerTime = Duration(minutes: 25);
     super.initState();
   }
 

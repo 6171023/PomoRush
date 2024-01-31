@@ -156,7 +156,7 @@ class _StoreScreenState extends State<StoreScreen> {
                             width: 50,
                             height: 50,
                           ),
-                          SizedBox(width: 10),
+                          SizedBox(width: 5),
                           Text(badge.name),
                         ],
                       ),
@@ -247,10 +247,11 @@ class _StoreScreenState extends State<StoreScreen> {
 
   Future<void> _equipBadge(BuildContext context, StoreBadge badge) async {
     widget.store.equipBadge(badge);
-    badge.isEquipped = true; // Equip the badge
+    badge.isEquipped = true;
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text('Badge ${badge.name} equipped!'),
+        duration: const Duration(seconds: 3),
       ),
     );
     return Future.value();
@@ -258,10 +259,11 @@ class _StoreScreenState extends State<StoreScreen> {
 
   Future<void> _unequipBadge(BuildContext context, StoreBadge badge) async {
     widget.store.unequipBadge(badge);
-    badge.isEquipped = false; // Unequip the badge
+    badge.isEquipped = false;
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text('Badge ${badge.name} unequipped!'),
+        duration: const Duration(seconds: 3),
       ),
     );
     return Future.value();
@@ -278,6 +280,7 @@ class _StoreScreenState extends State<StoreScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('Badge ${badge.name} purchased!'),
+            duration: const Duration(seconds: 3),
           ),
         );
         setState(() {});
@@ -286,6 +289,7 @@ class _StoreScreenState extends State<StoreScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('Not enough money to purchase ${badge.name} :('),
+            duration: const Duration(seconds: 3),
           ),
         );
         return false;
@@ -294,6 +298,7 @@ class _StoreScreenState extends State<StoreScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('Oops! Not enough to purchase ${badge.name} :( Earn enough money by using the timer!'),
+          duration: const Duration(seconds: 3),
         ),
       );
       return false;

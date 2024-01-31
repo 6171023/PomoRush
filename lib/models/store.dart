@@ -13,7 +13,7 @@ class StoreBadge {
     required this.price,
     required this.imagePath,
     this.isEquipped = false,
-    this.isPurchased = false,
+    this.isPurchased = true,
   });
 
   factory StoreBadge.fromMap(Map<String, dynamic> map) {
@@ -22,7 +22,7 @@ class StoreBadge {
       price: map['price'].toDouble(),
       imagePath: map['image'],
       isEquipped: map['isEquipped'] ?? false,
-      isPurchased: map['isPurchased'] != null && map['isPurchased']['_seconds'] > 0,
+      isPurchased: map['isPurchased'] ?? false,
     );
   }
 
@@ -40,67 +40,51 @@ class Store {
 
   void _initializeAvailableBadges() {
     _availableBadges = [
-      StoreBadge(name: 'Badge 1', price: 1.0, imagePath: 'assets/coin.png'),
-      StoreBadge(name: 'Badge 2', price: 2.0, imagePath: 'assets/goen.png'),
-      StoreBadge(name: 'Badge 3', price: 3.0, imagePath: 'assets/coin.png'),
-      StoreBadge(name: 'Badge 4', price: 4.0, imagePath: 'assets/coin.png'),
-      // StoreBadge(name: 'Badge 5', price: 5.0),
-      // StoreBadge(name: 'Badge 6', price: 6.0),
+      StoreBadge(name: 'Rookie', price: 100.0, imagePath: 'assets/rookie.png', isEquipped: false, isPurchased: false),
+      StoreBadge(name: 'Veteran', price: 500.0, imagePath: 'assets/veteran.png', isEquipped: false, isPurchased: false),
+      StoreBadge(name: 'Elite', price: 1000.0, imagePath: 'assets/elite.png', isEquipped: false, isPurchased: false),
+      StoreBadge(name: 'Pro', price: 1500.0, imagePath: 'assets/pro.png', isEquipped: false, isPurchased: false),
+      StoreBadge(name: 'Master', price: 2000.0, imagePath: 'assets/master.png', isEquipped: false, isPurchased: false),
+      StoreBadge(name: 'Grandmaster', price: 2500.0, imagePath: 'assets/grandmaster.png', isEquipped: false, isPurchased: false),
+      StoreBadge(name: 'Legendary', price: 3000.0, imagePath: 'assets/legendary.png', isEquipped: false, isPurchased: false),
     ];
   }
 
   Future<void> initUserBadges() async {
     CollectionReference users = FirebaseFirestore.instance.collection('users');
-    DocumentSnapshot doc = await users.doc(FirebaseAuth.instance.currentUser!.uid).get();
+    QuerySnapshot snapshot = await users.where('email', isEqualTo: FirebaseAuth.instance.currentUser!.email).get();
 
-    // Check if the document exists and if "BadgeList" field exists
-    if (doc.exists && doc.data() != null) {
-      var data = doc.data() as Map<String, dynamic>;
+    if (snapshot.docs.isNotEmpty) {
+      for (DocumentSnapshot doc in snapshot.docs) {
+        var data = doc.data() as Map<String, dynamic>;
 
-      if (data.containsKey('BadgeList')) {
-        var badgeList = List<String>.from(data['BadgeList']);
-        var myBadge = data['myBadge'];
+        if (data.containsKey('BadgeList')) {
+          var badgeList = List<String>.from(data['BadgeList']);
+          var myBadge = data['myBadge'];
 
-        // Initialize _availableBadges and _userBadges
-        _initializeAvailableBadges();
-        _userBadges = [];
+          _initializeAvailableBadges();
+          _userBadges = [];
 
-        // Iterate over _availableBadges and set isPurchased and isEquipped based on badgeList and myBadge
-        for (var badge in _availableBadges) {
-          if (badgeList.contains(badge.name)) {
-            _userBadges.add(badge);
-            badge.isPurchased = true;
-            // Get the isEquipped field from Firestore
-            badge.isEquipped = data['BadgeList'][badge.name]['isEquipped'];
-            if (badge.name == myBadge) {
-              badge.isEquipped = true;
+          for (var badge in _availableBadges) {
+            if (badgeList.contains(badge.name)) {
+              badge.isPurchased = true;
+              _userBadges.add(badge);
+
+              if (myBadge == badge.name) {
+                badge.isEquipped = true;
+              }
             } else {
-              badge.isEquipped = false;
+              badge.isPurchased = false;
             }
           }
-          else {
-            badge.isPurchased = false;
-          }
+        } else {
+          print('BadgeList is not present in the document.');
         }
-
-        // Update _availableBadges based on Firebase data
-        for (var badge in _userBadges) {
-          if (badgeList.contains(badge.name)) {
-            badge.isPurchased = true;
-          } else if (!badgeList.contains(badge.name)) {
-            badge.isPurchased = false;
-          }
-        }
-      } else {
-        // Handle the case when "BadgeList" is not present in the document
-        print('BadgeList is not present in the document.');
       }
     } else {
-      // Handle the case when the document does not exist
-      print('Document does not exist.');
+      print('No documents found for the current user.');
     }
   }
-
 
   List<StoreBadge> getAvailableBadges() {
     return _availableBadges;
@@ -120,7 +104,6 @@ class Store {
       _deductUserMoney(badge.price);
       _userBadges.add(badge);
 
-      // Update the purchasedBadges field in the user document
       CollectionReference users = FirebaseFirestore.instance.collection('users');
       QuerySnapshot snapshot = await users.where('email', isEqualTo: FirebaseAuth.instance.currentUser!.email).get();
       if (snapshot.docs.isNotEmpty) {
@@ -139,18 +122,14 @@ class Store {
 
   Future<void> equipBadge(StoreBadge badge) async {
     if (_userBadges.contains(badge)) {
-      // Unequip all badges first
       for (var b in _userBadges) {
         b.isEquipped = false;
       }
 
-      // Then equip the selected badge
       badge.isEquipped = true;
 
-      // Determine the badge image path (or set it to null if no badge is equipped)
       String? badgeImagePath = badge.isPurchased ? '${badge.imagePath}' : null;
 
-      // Update badge status and image path in Firestore
       CollectionReference users = FirebaseFirestore.instance.collection('users');
       QuerySnapshot snapshot =
       await users.where('email', isEqualTo: FirebaseAuth.instance.currentUser!.email).get();
@@ -170,7 +149,6 @@ class Store {
     if (_userBadges.contains(badge)) {
       badge.isEquipped = false;
       badge.isPurchased = true;
-      // Update badge status in Firestore
       CollectionReference users = FirebaseFirestore.instance.collection('users');
       QuerySnapshot snapshot = await users.where('email', isEqualTo: FirebaseAuth.instance.currentUser!.email).get();
       if (snapshot.docs.isNotEmpty) {
@@ -207,10 +185,8 @@ class Store {
         .where('email', isEqualTo: FirebaseAuth.instance.currentUser!.email)
         .snapshots()
         .map((snapshot) {
-      // Use safe navigation to avoid null errors
       var badgeList = snapshot.docs.first["BadgeList"] as List<String>?;
 
-      // Return an empty list if badgeList is null
       return badgeList ?? [];
     });
   }
@@ -244,5 +220,4 @@ class Store {
     }
   }
 }
-
 

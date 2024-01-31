@@ -40,8 +40,8 @@ class _PointFlipState extends State<PointFlip> with SingleTickerProviderStateMix
       },
       child: Image.asset(
         'assets/coin.png',
-        width: 120, // Increase width here
-        height: 120, // Increase height here
+        width: 120,
+        height: 120,
       ),
     );
   }
@@ -86,8 +86,8 @@ class _CoinFlipState extends State<CoinFlip> with SingleTickerProviderStateMixin
       },
       child: Image.asset(
         'assets/goen.png',
-        width: 120, // Increase width here
-        height: 120, // Increase height here
+        width: 120,
+        height: 120, 
       ),
     );
   }

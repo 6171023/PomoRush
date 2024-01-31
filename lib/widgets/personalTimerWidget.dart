@@ -138,7 +138,6 @@ class _PersonalTimerWidgetState extends State<PersonalTimerWidget> {
     } catch (_) {}
 
     try {
-      //check is all timer have been initialized
       var timers = {
         "focus": isFocus,
         "focusTimer": timerTime.toString(),
@@ -160,7 +159,7 @@ class _PersonalTimerWidgetState extends State<PersonalTimerWidget> {
     focusMinutes.text = "25";
     breaktime.text = "5";
     sets.text = "4";
-    breakTimerTime = Duration(minutes: 25); // Update breakTimerTime to 25 minutes
+    breakTimerTime = Duration(minutes: 25);
     super.initState();
   }
 

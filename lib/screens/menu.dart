@@ -19,7 +19,6 @@ class _MenuState extends State<Menu> {
 
   String title = "PomoRush";
 
-  // Create an instance of the Store class
   late final Store store;
 
   late final List<Widget> _pages;
