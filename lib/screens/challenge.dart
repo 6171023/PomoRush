@@ -141,8 +141,14 @@ class _ChallengeListScreenState extends State<ChallengeListScreen> {
       children: [
         Expanded(
           child: ListTile(
-            title: Text(challenge.acceptorDisplayName),
+            title: Text(
+              // Display the other person's display name
+              challenge.acceptorEmail == FirebaseAuth.instance.currentUser!.email
+                  ? challenge.requesterDisplayName
+                  : challenge.acceptorDisplayName,
+            ),
             subtitle: Text(
+              // Display the other person's email address
               challenge.acceptorEmail == FirebaseAuth.instance.currentUser!.email
                   ? challenge.requesterEmail
                   : challenge.acceptorEmail,
@@ -157,6 +163,7 @@ class _ChallengeListScreenState extends State<ChallengeListScreen> {
           style: ButtonStyle(
             foregroundColor: MaterialStateProperty.all(Colors.white),
             backgroundColor: MaterialStateProperty.all(Colors.green),
+            elevation: MaterialStateProperty.all(5),
             shape: MaterialStateProperty.all<RoundedRectangleBorder>(
               RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(5),
@@ -166,9 +173,8 @@ class _ChallengeListScreenState extends State<ChallengeListScreen> {
           child: const Text('Start'),
         )
             : challenge.status == "request" &&
-            challenge.acceptorEmail ==
-                FirebaseAuth.instance.currentUser!.email
-            ? OutlinedButton(
+            challenge.acceptorEmail == FirebaseAuth.instance.currentUser!.email
+            ? ElevatedButton(
           onPressed: () {
             _acceptChallenge(challenge.id);
           },
@@ -181,8 +187,7 @@ class _ChallengeListScreenState extends State<ChallengeListScreen> {
           ),
           child: const Text('Accept'),
         )
-            : challenge.acceptorEmail ==
-            FirebaseAuth.instance.currentUser!.email &&
+            : challenge.acceptorEmail == FirebaseAuth.instance.currentUser!.email &&
             challenge.acceptorState == "Done"
             ? Container(
           padding: const EdgeInsets.all(5.0),
@@ -195,8 +200,7 @@ class _ChallengeListScreenState extends State<ChallengeListScreen> {
                 style: TextStyle(color: Colors.black),
               )),
         )
-            : challenge.requesterEmail ==
-            FirebaseAuth.instance.currentUser!.email &&
+            : challenge.requesterEmail == FirebaseAuth.instance.currentUser!.email &&
             challenge.requesterState == "Done"
             ? Container(
           padding: const EdgeInsets.all(5.0),
@@ -223,7 +227,7 @@ class _ChallengeListScreenState extends State<ChallengeListScreen> {
             foregroundColor: Colors.white,
             backgroundColor: Styles.pomodoroPrimaryColor,
             shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(5), // Adjust corner radius here
+              borderRadius: BorderRadius.circular(5),
             ),
           ),
           child: const Text('Open'),
@@ -231,7 +235,7 @@ class _ChallengeListScreenState extends State<ChallengeListScreen> {
             : Container(
           padding: const EdgeInsets.all(5.0),
           decoration: BoxDecoration(
-              color: Styles.pomodoroPrimaryColor,
+              color: Colors.black,
               borderRadius:
               BorderRadius.circular(20)),
           child: Center(

@@ -172,7 +172,11 @@ class _PersonalTimerWidgetState extends State<PersonalTimerWidget> {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
+    return GestureDetector(
+        onTap: () {
+      FocusManager.instance.primaryFocus?.unfocus();
+    },
+    child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
@@ -422,6 +426,8 @@ class _PersonalTimerWidgetState extends State<PersonalTimerWidget> {
               ],
             ),
           )
-        ]);
+        ]
+    )
+    );
   }
 }

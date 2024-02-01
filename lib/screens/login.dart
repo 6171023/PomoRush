@@ -77,41 +77,47 @@ class _LoginPageState extends State<LoginPage> {
                     style: TextStyle(fontSize: 25.0, fontWeight: FontWeight.bold),
                   ),
                 ),
-                Column(
+                Stack(
+                children: [
+                  Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     AnimatedOpacity(
                       duration: Duration(milliseconds: 300),
                       opacity: _buttonOpacity,
-                      child: SignInButton(
-                        buttonType: ButtonType.google,
-                        buttonSize: ButtonSize.large,
-                        onPressed: () {
-                          GoogleAuthService().signIn();
-                        },
+                      child: Container(
+                        child: SignInButton(
+                          buttonType: ButtonType.google,
+                          buttonSize: ButtonSize.small,
+                          onPressed: () {
+                            GoogleAuthService().signIn();
+                          },
+                        ),
                       ),
                     ),
-                    // SizedBox(width: 20), // Adjust this value to increase or decrease the space between the buttons
                     Container(
-                      width: 200, // Set the desired width here
+                      width: 150,
                       child: Divider(
                         color: Colors.black.withOpacity(0.3),
                         thickness: 1,
                       ),
                     ),
-                    // SizedBox(width: 20), // Adjust this value to increase or decrease the space between the buttons
                     AnimatedOpacity(
                       duration: Duration(milliseconds: 300),
                       opacity: _buttonOpacity,
-                      child: SignInButton(
-                        buttonType: ButtonType.apple,
-                        buttonSize: ButtonSize.large,
-                        onPressed: () {
-                          AppleAuthService().signIn();
-                        },
+                      child: Container(
+                        child: SignInButton(
+                          buttonType: ButtonType.appleDark,
+                          buttonSize: ButtonSize.small,
+                          onPressed: () {
+                            AppleAuthService().signIn();
+                          },
+                        ),
                       ),
                     ),
                   ],
+                )
+                ]
                 )
               ],
             ),

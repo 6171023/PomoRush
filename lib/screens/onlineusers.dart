@@ -310,7 +310,6 @@ class _OnlineActiveUsersState extends State<OnlineActiveUsers> {
                             'Badge: ',
                             style: TextStyle(
                               fontSize: 15,
-                              color: Styles.pomodoroPrimaryColor,
                             ),
                           ),
                           Image.asset(
@@ -324,7 +323,6 @@ class _OnlineActiveUsersState extends State<OnlineActiveUsers> {
                         'Badge: ${user.myBadge}',
                         style: TextStyle(
                           fontSize: 15,
-                          color: Styles.pomodoroPrimaryColor,
                         ),
                       ),
                     ],
@@ -335,12 +333,11 @@ class _OnlineActiveUsersState extends State<OnlineActiveUsers> {
             ),
             user.email == FirebaseAuth.instance.currentUser!.email
                 ? Container()
-                : TextButton(
+                : ElevatedButton(
               onPressed: () {
                 setState(() {
                   //set the value on clicking request
-                  requesterEmail =
-                      FirebaseAuth.instance.currentUser!.email;
+                  requesterEmail = FirebaseAuth.instance.currentUser!.email;
                   acceptorEmail = user.email;
                   acceptorName = user.displayName;
                 });
@@ -348,18 +345,15 @@ class _OnlineActiveUsersState extends State<OnlineActiveUsers> {
               },
               style: ButtonStyle(
                 minimumSize: MaterialStateProperty.all(
-                    Size(MediaQuery
-                        .of(context)
-                        .size
-                        .width/4, 40)),
+                    Size(MediaQuery.of(context).size.width / 4, 40)),
                 shape: MaterialStateProperty.all(
                   RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(5),
                   ),
                 ),
                 foregroundColor: MaterialStateProperty.all(Colors.white),
-                backgroundColor:
-                MaterialStateProperty.all(Styles.pomodoroPrimaryColor),
+                backgroundColor: MaterialStateProperty.all(Styles.pomodoroPrimaryColor),
+                elevation: MaterialStateProperty.all(5),
               ),
               child: const Text('Request'),
             )

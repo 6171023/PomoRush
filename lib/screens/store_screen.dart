@@ -86,12 +86,6 @@ class _StoreScreenState extends State<StoreScreen> {
               },
             ),
             const SizedBox(height: 10.0),
-            Text(
-              'Access the money earning Pomodoro timer from the button below to earn money. You will earn money that is half of your focus minutes value.',
-              textAlign: TextAlign.start,
-              style: TextStyle(fontSize: 15.0),
-            ),
-            const SizedBox(height: 10.0),
             Center(
               child: ElevatedButton(
                 onPressed: () {
@@ -119,8 +113,8 @@ class _StoreScreenState extends State<StoreScreen> {
                     ),
                   ),
                   foregroundColor: MaterialStateProperty.all(Colors.white),
-                  backgroundColor:
-                  MaterialStateProperty.all(Styles.pomodoroPrimaryColor),
+                  backgroundColor: MaterialStateProperty.all(Styles.pomodoroPrimaryColor),
+                  elevation: MaterialStateProperty.all(7),
                 ),
                 child: const Text(
                   'Earn Money',
@@ -134,7 +128,7 @@ class _StoreScreenState extends State<StoreScreen> {
               style: TextStyle(fontSize: 20.0, fontWeight: FontWeight.bold),
             ),
             Text(
-              'Purchase badges and equip them one at a time as per your choice! Equipped badges will be viewable to other users through the users page.',
+              'Purchase badges in the following list box and equip them one at a time as per your choice! Equipped badges will be viewable to other users through the users page.',
               textAlign: TextAlign.start,
               style: TextStyle(fontSize: 15.0),
             ),
@@ -149,16 +143,19 @@ class _StoreScreenState extends State<StoreScreen> {
                   itemBuilder: (context, index) {
                     final badge = widget.store.getAvailableBadges()[index];
                     return ListTile(
-                      title: Row(
-                        children: [
-                          Image.asset(
-                            badge.imagePath,
-                            width: 50,
-                            height: 50,
-                          ),
-                          SizedBox(width: 5),
-                          Text(badge.name),
-                        ],
+                      title: Align(
+                        alignment: Alignment.topLeft,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Image.asset(
+                              badge.imagePath,
+                              width: 50,
+                              height: 50,
+                            ),
+                            Text(badge.name),
+                          ],
+                        ),
                       ),
                       subtitle: Text('Price: \¥${badge.price}'),
                       trailing: _buildBadgeButton(context, badge),
@@ -194,8 +191,8 @@ class _StoreScreenState extends State<StoreScreen> {
             ),
           ),
           foregroundColor: MaterialStateProperty.all(Colors.white),
-          backgroundColor:
-          MaterialStateProperty.all(Colors.blueGrey),
+          backgroundColor: MaterialStateProperty.all(Colors.blueGrey),
+          elevation: MaterialStateProperty.all(5),
         ),
       );
     } else if (isBadgePurchased && !isBadgeEquipped) {
@@ -214,8 +211,8 @@ class _StoreScreenState extends State<StoreScreen> {
             ),
           ),
           foregroundColor: MaterialStateProperty.all(Colors.white),
-          backgroundColor:
-          MaterialStateProperty.all(Colors.green),
+          backgroundColor: MaterialStateProperty.all(Colors.green),
+          elevation: MaterialStateProperty.all(5),
         ),
       );
     } else {
@@ -236,8 +233,8 @@ class _StoreScreenState extends State<StoreScreen> {
             ),
           ),
           foregroundColor: MaterialStateProperty.all(Colors.white),
-          backgroundColor:
-          MaterialStateProperty.all(Colors.brown),
+          backgroundColor: MaterialStateProperty.all(Colors.brown),
+          elevation: MaterialStateProperty.all(5),
         ),
       );
     }

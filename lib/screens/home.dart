@@ -41,184 +41,156 @@ class _WelcomePageState extends State<WelcomePage> {
     super.initState();
   }
 
-  @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: Center(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
-              StreamBuilder<AuthUser>(
-                  stream: getUser(),
-                  builder: (context, snapshot) {
-                    if (snapshot.hasData) {
-                      final users = snapshot.data!;
-
-                      return getUserInfo(users);
-                    } else {
-                      return const Center(child: CircularProgressIndicator());
-                    }
-                  }),
-
-              ElevatedButton(
-                onPressed: () {
-                  Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) =>
-                          const TimerSettingsScreen(
-                            isChallenge: false,
-                          ))).then((value) {
-                    if (value != null && value) {}
-                  });
-                },
-                style: ButtonStyle(
-                  minimumSize: MaterialStateProperty.all(
-                      Size(MediaQuery
-                          .of(context)
-                          .size
-                          .width * 0.75, 40)),
-                  shape: MaterialStateProperty.all(
-                    RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(5),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          children: [
+            StreamBuilder<AuthUser>(
+              stream: getUser(),
+              builder: (context, snapshot) {
+                if (snapshot.hasData) {
+                  final user = snapshot.data!;
+                  return getUserInfo(user);
+                } else {
+                  return Center(child: CircularProgressIndicator());
+                }
+              },
+            ),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const TimerSettingsScreen(
+                      isChallenge: false,
                     ),
                   ),
-                  foregroundColor: MaterialStateProperty.all(Colors.white),
-                  backgroundColor:
-                  MaterialStateProperty.all(Styles.pomodoroPrimaryColor),
+                ).then((value) {
+                  if (value != null && value) {}
+                });
+              },
+              style: ElevatedButton.styleFrom(
+                minimumSize: Size(MediaQuery.of(context).size.width * 0.75, 40),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(5),
                 ),
-                child: const Text(
-                  'Use the Pomodoro Timer',
-                  style: TextStyle(fontSize: 18),
-                ),
+                backgroundColor: Styles.pomodoroPrimaryColor,
+                foregroundColor: Colors.white,
+                elevation: 7
               ),
-            ],
-          )),
-      bottomNavigationBar: Padding(
-        padding: EdgeInsets.only(bottom: 30, right: 128, left: 128),
-        // Add bottom padding
-        child: Container(
-          width: 100,
-          height: 50,
-          decoration: BoxDecoration(
-            color: Styles.pomodoroPrimaryColor,
-            borderRadius: BorderRadius.circular(30),
-          ),
-          child: TextButton(
-            onPressed: () {
-              GoogleAuthService().signOut();
-            },
-            style: ButtonStyle(
-              shape: MaterialStateProperty.all(
-                  const RoundedRectangleBorder(
-                      borderRadius: BorderRadius.zero)),
-              foregroundColor: MaterialStateProperty.all(Colors.white),
+              child: Text(
+                'Use the Pomodoro Timer',
+                style: TextStyle(fontSize: 18),
+              ),
             ),
-            child: const Text(
-              'SIGN OUT',
-              style: TextStyle(fontSize: 18),
+            ElevatedButton(
+              onPressed: () {
+                GoogleAuthService().signOut();
+              },
+              style: ElevatedButton.styleFrom(
+                minimumSize: Size(MediaQuery.of(context).size.width * 0.3, 40),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(20),
+                  side: BorderSide(color: Colors.black, width: 2),
+                ),
+                backgroundColor: Colors.white,
+                foregroundColor: Styles.pomodoroPrimaryColor,
+                elevation: 10,
+              ),
+              child: Text(
+                'SIGN OUT',
+                style: TextStyle(fontSize: 18),
+              ),
             ),
-          ),
+          ],
         ),
       ),
     );
   }
 
-  Widget getUserInfo(AuthUser user) =>
-      Column(
-        children: [
-
-          Text(
-            'Hi ${user.displayName}!',
-            style: TextStyle(
-              fontSize: 25,
-              color: Styles.pomodoroPrimaryColor,
-            ),
+  Widget getUserInfo(AuthUser user) {
+    return Column(
+      children: [
+        Text(
+          'Hi ${user.displayName}!',
+          style: TextStyle(
+            fontSize: 25,
+            color: Styles.pomodoroPrimaryColor,
           ),
-          const SizedBox(
-            height: 30,
-          ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.start,
+        ),
+        SizedBox(height: 30),
+        Padding(
+          padding: EdgeInsets.symmetric(horizontal: MediaQuery.of(context).size.width * 0.1),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Padding(
-                padding: const EdgeInsets.all(45.0), // Add margins here
-                child: Column(
-                  children: [
-                    PointFlip(points: user.myPoints),
-                    Text(
-                      'Points: ${user.myPoints}',
-                      style: TextStyle(
-                        fontSize: 20,
-                        color: Styles.pomodoroPrimaryColor,
-                      ),
+              Column(
+                children: [
+                  PointFlip(points: user.myPoints),
+                  Text(
+                    'Points: ${user.myPoints}',
+                    style: TextStyle(
+                      fontSize: 20,
+                      color: Styles.pomodoroPrimaryColor,
                     ),
-                  ],
-                ),
+                  ),
+                ],
               ),
-              SizedBox(width: 8),
-              Padding(
-                padding: const EdgeInsets.all(10.0),
-                child: Column(
-                  children: [
-                    CoinFlip(money: user.myMoney),
-                    Text(
-                      'Money: ${user.myMoney}',
-                      style: TextStyle(
-                        fontSize: 20,
-                        color: Styles.pomodoroPrimaryColor,
-                      ),
+              SizedBox(width: 30),
+              Column(
+                children: [
+                  CoinFlip(money: user.myMoney),
+                  Text(
+                    'Money: ${user.myMoney}',
+                    style: TextStyle(
+                      fontSize: 20,
+                      color: Styles.pomodoroPrimaryColor,
                     ),
-                  ],
-                ),
+                  ),
+                ],
               ),
             ],
           ),
-          Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                user.myBadgeImagePath != null
-                    ? Center(
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text(
-                        'Equipped badge: ',
-                        style: TextStyle(
-                          fontSize: 20,
-                          color: Styles.pomodoroPrimaryColor,
-                        ),
-                      ),
-                      Image.asset(
-                        user.myBadgeImagePath!,
-                        width: 50,
-                        height: 50,
-                      ),
-                      // SizedBox(width: 3,),
-                      // Text(
-                      //   '${user.myBadge}',
-                      //   style: TextStyle(
-                      //     fontSize: 20,
-                      //     color: Styles.pomodoroPrimaryColor,
-                      //   ),
-                      // ),
-                    ],
+        ),
+        SizedBox(height: 50),
+        Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              user.myBadgeImagePath != null
+                  ? Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    'Equipped badge: ',
+                    style: TextStyle(
+                      fontSize: 20,
+                      color: Styles.pomodoroPrimaryColor,
+                    ),
                   ),
-                )
-                    : Text(
-                  'Equipped badge: ${user.myBadge}',
-                  style: TextStyle(
-                    fontSize: 20,
-                    color: Styles.pomodoroPrimaryColor,
+                  Image.asset(
+                    user.myBadgeImagePath!,
+                    width: 50,
+                    height: 50,
                   ),
+                ],
+              )
+                  : Text(
+                'Equipped badge: ${user.myBadge}',
+                style: TextStyle(
+                  fontSize: 20,
+                  color: Styles.pomodoroPrimaryColor,
                 ),
-              ],
-            ),
+              ),
+            ],
+
+
           ),
+        ),
+      ],
+    );
+  }
 
-
-        ],
-      );
 }

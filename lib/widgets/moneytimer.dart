@@ -233,7 +233,11 @@ class _MoneyTimerWidgetState extends State<MoneyTimerWidget> {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
+    return GestureDetector(
+        onTap: () {
+      FocusManager.instance.primaryFocus?.unfocus();
+    },
+    child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
@@ -259,23 +263,22 @@ class _MoneyTimerWidgetState extends State<MoneyTimerWidget> {
               ),
             ),
           ),
-          const SizedBox(
-            height: 10,
+          const SizedBox(height: 5.0),
+          Text(
+            'Access the money earning Pomodoro timer from the button below to earn money. You will earn money that is half of your focus minutes value.',
+            textAlign: TextAlign.start,
           ),
+          const SizedBox(height: 5,),
           const Text(
             'Specify your focus, break and repeat set on the fields.',
             textAlign: TextAlign.start,
           ),
-          const SizedBox(
-            height: 10,
-          ),
+          const SizedBox(height: 5,),
           const Text(
             'Enabling the strict mode option restricts you from pausing the timer once it starts.',
             textAlign: TextAlign.start,
           ),
-          const SizedBox(
-            height: 10,
-          ),
+          const SizedBox(height: 10,),
           Row(
             children: [
               Expanded(
@@ -482,6 +485,8 @@ class _MoneyTimerWidgetState extends State<MoneyTimerWidget> {
               ],
             ),
           )
-        ]);
+        ]
+    )
+    );
   }
 }

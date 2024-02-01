@@ -99,7 +99,7 @@ class _MenuState extends State<Menu> {
         type: BottomNavigationBarType.fixed,
         items: const <BottomNavigationBarItem>[
           BottomNavigationBarItem(
-            icon: Icon(Icons.home),
+            icon: Icon(Icons.home_rounded),
             label: 'Home',
           ),
           BottomNavigationBarItem(
@@ -115,7 +115,7 @@ class _MenuState extends State<Menu> {
             label: 'Rank',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.compare_arrows),
+            icon: Icon(Icons.compare_arrows_rounded),
             label: 'Challenge',
           ),
         ],

@@ -65,7 +65,7 @@ class _LeaderBoardState extends State<LeaderBoard> {
                                             ? Colors.grey
                                             : i == 2
                                             ? Colors.brown
-                                            : Colors.white,
+                                            : Colors.transparent,
                                         width: 3.0,
                                         style: BorderStyle.solid),
                                     borderRadius: BorderRadius.circular(5.0)),
