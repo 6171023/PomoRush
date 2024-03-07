@@ -14,6 +14,7 @@ class WelcomePage extends StatefulWidget {
   State<WelcomePage> createState() => _WelcomePageState();
 }
 
+
 class _WelcomePageState extends State<WelcomePage> {
   Stream<AuthUser> getUser() =>
       FirebaseFirestore.instance
@@ -85,24 +86,48 @@ class _WelcomePageState extends State<WelcomePage> {
                 style: TextStyle(fontSize: 18),
               ),
             ),
-            ElevatedButton(
-              onPressed: () {
-                GoogleAuthService().signOut();
-              },
-              style: ElevatedButton.styleFrom(
-                minimumSize: Size(MediaQuery.of(context).size.width * 0.3, 40),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(20),
-                  side: BorderSide(color: Colors.black, width: 2),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                ElevatedButton(
+                  onPressed: () {
+                    Deletion().accountDeletion(context);
+                  },
+                  style: ElevatedButton.styleFrom(
+                    minimumSize: Size(MediaQuery.of(context).size.width * 0.3, 40),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(20),
+                      side: BorderSide(color: Colors.black, width: 2),
+                    ),
+                    backgroundColor: Colors.red.shade900,
+                    foregroundColor: Colors.white,
+                    elevation: 10,
+                  ),
+                  child: Text(
+                    'DELETE',
+                    style: TextStyle(fontSize: 18),
+                  ),
                 ),
-                backgroundColor: Colors.white,
-                foregroundColor: Styles.pomodoroPrimaryColor,
-                elevation: 10,
-              ),
-              child: Text(
-                'SIGN OUT',
-                style: TextStyle(fontSize: 18),
-              ),
+                ElevatedButton(
+                  onPressed: () {
+                    GoogleAuthService().signOut();
+                  },
+                  style: ElevatedButton.styleFrom(
+                    minimumSize: Size(MediaQuery.of(context).size.width * 0.3, 40),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(20),
+                      side: BorderSide(color: Colors.black, width: 2),
+                    ),
+                    backgroundColor: Colors.white,
+                    foregroundColor: Styles.pomodoroPrimaryColor,
+                    elevation: 10,
+                  ),
+                  child: Text(
+                    'SIGN OUT',
+                    style: TextStyle(fontSize: 18),
+                  ),
+                ),
+              ],
             ),
           ],
         ),
@@ -185,8 +210,6 @@ class _WelcomePageState extends State<WelcomePage> {
                 ),
               ),
             ],
-
-
           ),
         ),
       ],

@@ -6,245 +6,249 @@ import 'package:pomo_rush/utils/preferences.dart';
 import 'package:pomo_rush/widgets/challengeTimerWidget.dart';
 
 class ChallengeListScreen extends StatefulWidget {
-  const ChallengeListScreen({super.key});
+  const ChallengeListScreen({Key? key});
 
   @override
   State<ChallengeListScreen> createState() => _ChallengeListScreenState();
 }
 
 class _ChallengeListScreenState extends State<ChallengeListScreen> {
-  bool isloading = false;
+  bool isLoading = false;
 
   Stream<List<Challenge>> readChallenges() => FirebaseFirestore.instance
       .collection('challenge')
       .snapshots()
       .map((snapshot) => snapshot.docs
       .where((doc) => doc['acceptorEmail'] == FirebaseAuth.instance.currentUser!.email || doc['requesterEmail'] == FirebaseAuth.instance.currentUser!.email)
-      .map((doc) => Challenge.fromJson(doc.data(), doc.id))
+      .map((doc) => Challenge.fromJson(doc.data() as Map<String, dynamic>, doc.id))
       .toList())
       .handleError((onError) {});
 
+  Future<bool> checkUserExists(String email) async {
+    final querySnapshot = await FirebaseFirestore.instance
+        .collection('users')
+        .where('email', isEqualTo: email)
+        .limit(1)
+        .get();
 
-  late String acceptorEmail = '';
-  late String acceptorName = '';
-  late String acceptorEndTime = '';
-  late String challengeEndTime = '';
-  late String? requesterEmail = '';
-  late String requesterEndTime = '';
-  late String challengeStartTime = '';
-  late int breakTime = 5;
-  late int focusTime = 25;
-  late int setCount = 4;
+    return querySnapshot.docs.isNotEmpty;
+  }
+
+  Widget buildChallenge(Challenge challenge) => FutureBuilder<bool>(
+    future: checkUserExists(challenge.acceptorEmail == FirebaseAuth.instance.currentUser!.email || challenge.requesterEmail == FirebaseAuth.instance.currentUser!.email
+        ? challenge.requesterEmail
+        : challenge.acceptorEmail),
+    builder: (context, snapshot) {
+     if (snapshot.hasData && snapshot.data!) {
+        return Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Row(
+            children: [
+              Expanded(
+                child: ListTile(
+                  title: Text(
+                    // Display the other person's display name
+                    challenge.acceptorEmail == FirebaseAuth.instance.currentUser!.email
+                        ? challenge.requesterDisplayName
+                        : challenge.acceptorDisplayName,
+                  ),
+                  subtitle: Text(
+                    // Display the other person's email address
+                    challenge.acceptorEmail == FirebaseAuth.instance.currentUser!.email
+                        ? challenge.requesterEmail
+                        : challenge.acceptorEmail,
+                  ),
+                ),
+              ),
+              if (challenge.status == "accepted")
+                TextButton(
+                  onPressed: () {
+                    _startChallenge(challenge.id, challenge);
+                  },
+                  style: ButtonStyle(
+                    foregroundColor: MaterialStateProperty.all(Colors.white),
+                    backgroundColor: MaterialStateProperty.all(Colors.green),
+                    elevation: MaterialStateProperty.all(5),
+                    shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+                      RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(5),
+                      ),
+                    ),
+                  ),
+                  child: const Text('Start'),
+                )
+              else if (challenge.status == "request" &&
+                  challenge.acceptorEmail == FirebaseAuth.instance.currentUser!.email)
+                ElevatedButton(
+                  onPressed: () {
+                    _acceptChallenge(challenge.id);
+                  },
+                  style: OutlinedButton.styleFrom(
+                    foregroundColor: Colors.white,
+                    backgroundColor: Colors.blue,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(5),
+                    ),
+                  ),
+                  child: const Text('Accept'),
+                )
+              else if ((challenge.acceptorEmail == FirebaseAuth.instance.currentUser!.email &&
+                    challenge.acceptorState == "Done") ||
+                    (challenge.requesterEmail == FirebaseAuth.instance.currentUser!.email &&
+                        challenge.requesterState == "Done"))
+                  Container(
+                    padding: const EdgeInsets.all(5.0),
+                    decoration: BoxDecoration(
+                        color: Colors.grey, borderRadius: BorderRadius.circular(20)),
+                    child: const Center(
+                        child: Text(
+                          ' Finished ',
+                          style: TextStyle(color: Colors.black),
+                        )),
+                  )
+                else if (challenge.status == "started")
+                    OutlinedButton(
+                      onPressed: () {
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => ChallengeTimerWidget(challenge: challenge)));
+                      },
+                      style: OutlinedButton.styleFrom(
+                        foregroundColor: Colors.white,
+                        backgroundColor: Colors.green,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(5),
+                        ),
+                      ),
+                      child: const Text('Open'),
+                    )
+                  else
+                    Container(
+                      padding: const EdgeInsets.all(5.0),
+                      decoration: BoxDecoration(color: Colors.black, borderRadius: BorderRadius.circular(20)),
+                      child: Center(
+                          child: Text(
+                            challenge.status == "request" ? " Requested " : challenge.status,
+                            style: const TextStyle(color: Colors.white),
+                          )),
+                    ),
+            ],
+          ),
+        );
+      } else {
+        // User data not found, so don't display the challenge
+        return Container();
+      }
+    },
+  );
 
   _startChallenge(String docId, Challenge chlg) async {
     setState(() {
-      isloading = true;
+      isLoading = true;
     });
-    CollectionReference challenge =
-    FirebaseFirestore.instance.collection('challenge');
+    CollectionReference challenge = FirebaseFirestore.instance.collection('challenge');
 
-    challenge.doc(docId).update({
-      "status": "started",
-      "startedBy": FirebaseAuth.instance.currentUser!.email
-    }).then((value) {
-      setState(() {
-        isloading = false;
+    try {
+      await challenge.doc(docId).update({
+        "status": "started",
+        "startedBy": FirebaseAuth.instance.currentUser!.email,
       });
-      Navigator.push(
-          context,
-          MaterialPageRoute(
-              builder: (context) => ChallengeTimerWidget(challenge: chlg)));
-    }).catchError((onError) {
+
       setState(() {
-        isloading = false;
+        isLoading = false;
+      });
+
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => ChallengeTimerWidget(challenge: chlg),
+        ),
+      );
+    } catch (error) {
+      setState(() {
+        isLoading = false;
       });
       AppResponse.showAlertBottomSheet(
-          title: 'Failed',
-          message: "Something went wrong. Request failed",
-          context: context,
-          color: Colors.red);
-    });
+        title: 'Failed',
+        message: "Something went wrong. Request failed",
+        context: context,
+        color: Colors.red,
+      );
+    }
   }
 
   _acceptChallenge(String docId) async {
     setState(() {
-      isloading = true;
+      isLoading = true;
     });
-    CollectionReference challenge =
-    FirebaseFirestore.instance.collection('challenge');
+    CollectionReference challenge = FirebaseFirestore.instance.collection('challenge');
 
-    challenge.doc(docId).update({"status": "accepted"}).then((value) {
+    try {
+      await challenge.doc(docId).update({"status": "accepted"});
+
       setState(() {
-        isloading = false;
+        isLoading = false;
+      });
+
+      AppResponse.showAlertBottomSheet(
+        title: 'Request Sent',
+        message: "Request sent successful",
+        context: context,
+        color: Colors.green,
+      );
+    } catch (error) {
+      setState(() {
+        isLoading = false;
       });
       AppResponse.showAlertBottomSheet(
-          title: 'Request Sent',
-          message: "Request sent successful",
-          context: context,
-          color: Colors.green);
-    }).catchError((onError) {
-      setState(() {
-        isloading = false;
-      });
-      AppResponse.showAlertBottomSheet(
-          title: 'Failed',
-          message: "Something went wrong. Request failed",
-          context: context,
-          color: Colors.red);
-    });
+        title: 'Failed',
+        message: "Something went wrong. Request failed",
+        context: context,
+        color: Colors.red,
+      );
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-    return isloading
+    return isLoading
         ? const Center(child: CircularProgressIndicator())
         : StreamBuilder<List<Challenge>>(
-        stream: readChallenges(),
-        builder: (context, snapshot) {
-          if (snapshot.hasData) {
-            final challenge = snapshot.data!;
+      stream: readChallenges(),
+      builder: (context, snapshot) {
+        if (snapshot.hasData) {
+          final challenge = snapshot.data!;
 
-            return ListView(
-              children: <Widget>[
-                const SizedBox(
-                  height: 20,
-                ),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                  child: Text(
-                    'People you send and receive challenges from appear here.',
-                    style: TextStyle(fontSize: 15.0),
-                  ),
-                ),
-                const SizedBox(
-                  height: 10,
-                ),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                  child: Text(
-                    "Let's compete in challenges to earn points and win!",
-                    style: TextStyle(fontSize: 15.0),
-                  ),
-                ),
-                ...challenge.map(buildChallenge).toList(),
-              ],
-            );
-          } else {
-            return const Center(child: CircularProgressIndicator());
-          }
-        });
-  }
-
-  Widget buildChallenge(Challenge challenge) => Padding(
-    padding: const EdgeInsets.all(8.0),
-    child: Row(
-      children: [
-        Expanded(
-          child: ListTile(
-            title: Text(
-              // Display the other person's display name
-              challenge.acceptorEmail == FirebaseAuth.instance.currentUser!.email
-                  ? challenge.requesterDisplayName
-                  : challenge.acceptorDisplayName,
-            ),
-            subtitle: Text(
-              // Display the other person's email address
-              challenge.acceptorEmail == FirebaseAuth.instance.currentUser!.email
-                  ? challenge.requesterEmail
-                  : challenge.acceptorEmail,
-            ),
-          ),
-        ),
-        challenge.status == "accepted"
-            ? TextButton(
-          onPressed: () {
-            _startChallenge(challenge.id, challenge);
-          },
-          style: ButtonStyle(
-            foregroundColor: MaterialStateProperty.all(Colors.white),
-            backgroundColor: MaterialStateProperty.all(Colors.green),
-            elevation: MaterialStateProperty.all(5),
-            shape: MaterialStateProperty.all<RoundedRectangleBorder>(
-              RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(5),
+          return ListView(
+            children: <Widget>[
+              const SizedBox(
+                height: 20,
               ),
-            ),
-          ),
-          child: const Text('Start'),
-        )
-            : challenge.status == "request" &&
-            challenge.acceptorEmail == FirebaseAuth.instance.currentUser!.email
-            ? ElevatedButton(
-          onPressed: () {
-            _acceptChallenge(challenge.id);
-          },
-          style: OutlinedButton.styleFrom(
-            foregroundColor: Colors.white,
-            backgroundColor: Colors.blue,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(5),
-            ),
-          ),
-          child: const Text('Accept'),
-        )
-            : challenge.acceptorEmail == FirebaseAuth.instance.currentUser!.email &&
-            challenge.acceptorState == "Done"
-            ? Container(
-          padding: const EdgeInsets.all(5.0),
-          decoration: BoxDecoration(
-              color: Colors.grey,
-              borderRadius: BorderRadius.circular(20)),
-          child: const Center(
-              child: Text(
-                ' Finished ',
-                style: TextStyle(color: Colors.black),
-              )),
-        )
-            : challenge.requesterEmail == FirebaseAuth.instance.currentUser!.email &&
-            challenge.requesterState == "Done"
-            ? Container(
-          padding: const EdgeInsets.all(5.0),
-          decoration: BoxDecoration(
-              color: Colors.grey,
-              borderRadius: BorderRadius.circular(20)),
-          child: const Center(
-              child: Text(
-                ' Finished ', //when both parties finish the challenge
-                style: TextStyle(color: Colors.black),
-              )),
-        )
-            : challenge.status == "started"
-            ? OutlinedButton(
-          onPressed: () {
-            Navigator.push(
-                context,
-                MaterialPageRoute(
-                    builder: (context) =>
-                        ChallengeTimerWidget(
-                            challenge: challenge)));
-          },
-          style: OutlinedButton.styleFrom(
-            foregroundColor: Colors.white,
-            backgroundColor: Styles.pomodoroPrimaryColor,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(5),
-            ),
-          ),
-          child: const Text('Open'),
-        )
-            : Container(
-          padding: const EdgeInsets.all(5.0),
-          decoration: BoxDecoration(
-              color: Colors.black,
-              borderRadius:
-              BorderRadius.circular(20)),
-          child: Center(
-              child: Text(
-                challenge.status == "request" ? " Requested " : challenge.status,
-                style: const TextStyle(color: Colors.white),
-              )),
-        )
-      ],
-    ),
-  );
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                child: Text(
+                  'People you send and receive challenges from appear here.',
+                  style: TextStyle(fontSize: 15.0),
+                ),
+              ),
+              const SizedBox(
+                height: 10,
+              ),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                child: Text(
+                  "Let's compete in challenges to earn points and win!",
+                  style: TextStyle(fontSize: 15.0),
+                ),
+              ),
+              ...challenge.map(buildChallenge).toList(),
+            ],
+          );
+        } else {
+          return const Center(child: CircularProgressIndicator());
+        }
+      },
+    );
+  }
 }

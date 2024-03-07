@@ -27,12 +27,15 @@ class _LoginPageState extends State<LoginPage> {
   @override
   void initState() {
     super.initState();
+    _padding = 12.0;
+    _buttonOpacity = 0.5;
+
     _timer = Timer.periodic(Duration(seconds: 1), (timer) {
       setState(() {
-        _padding = _padding == 16.0 ? 8.0 : 16.0;
         _buttonOpacity = _buttonOpacity == 1.0 ? 0.5 : 1.0;
       });
     });
+
     _confettiController = ConfettiController(duration: const Duration(seconds: 10));
     _confettiController.play();
   }
@@ -77,47 +80,68 @@ class _LoginPageState extends State<LoginPage> {
                     style: TextStyle(fontSize: 25.0, fontWeight: FontWeight.bold),
                   ),
                 ),
+                Padding(
+                  padding: EdgeInsets.symmetric(horizontal: _padding),
+                  child: Center(
+                    child: RichText(
+                      textAlign: TextAlign.center,
+                      text: TextSpan(
+                        style: TextStyle(fontSize: 15.0, color: Colors.black),
+                        children: [
+                          TextSpan(
+                            text: 'IMPORTANT: ',
+                            style: TextStyle(fontWeight: FontWeight.bold),
+                          ),
+                          TextSpan(text: '\n'), // Add a new line
+                          TextSpan(
+                            text: 'Please keep in mind that your *name* will be displayed on the global leaderboard that is accessible to ALL other users and your *email* will be displayed to other users you challenge.',
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
                 Stack(
-                children: [
-                  Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    AnimatedOpacity(
-                      duration: Duration(milliseconds: 300),
-                      opacity: _buttonOpacity,
-                      child: Container(
-                        child: SignInButton(
-                          buttonType: ButtonType.google,
-                          buttonSize: ButtonSize.small,
-                          onPressed: () {
-                            GoogleAuthService().signIn();
-                          },
+                    Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        AnimatedOpacity(
+                          duration: Duration(milliseconds: 300),
+                          opacity: _buttonOpacity,
+                          child: Container(
+                            child: SignInButton(
+                              buttonType: ButtonType.google,
+                              buttonSize: ButtonSize.small,
+                              onPressed: () {
+                                GoogleAuthService().signIn();
+                              },
+                            ),
+                          ),
                         ),
-                      ),
-                    ),
-                    Container(
-                      width: 150,
-                      child: Divider(
-                        color: Colors.black.withOpacity(0.3),
-                        thickness: 1,
-                      ),
-                    ),
-                    AnimatedOpacity(
-                      duration: Duration(milliseconds: 300),
-                      opacity: _buttonOpacity,
-                      child: Container(
-                        child: SignInButton(
-                          buttonType: ButtonType.appleDark,
-                          buttonSize: ButtonSize.small,
-                          onPressed: () {
-                            AppleAuthService().signIn();
-                          },
+                        Container(
+                          width: 150,
+                          child: Divider(
+                            color: Colors.black.withOpacity(0.3),
+                            thickness: 1,
+                          ),
                         ),
-                      ),
-                    ),
+                        AnimatedOpacity(
+                          duration: Duration(milliseconds: 300),
+                          opacity: _buttonOpacity,
+                          child: Container(
+                            child: SignInButton(
+                              buttonType: ButtonType.appleDark,
+                              buttonSize: ButtonSize.small,
+                              onPressed: () {
+                                AppleAuthService().signIn();
+                              },
+                            ),
+                          ),
+                        ),
+                      ],
+                    )
                   ],
-                )
-                ]
                 )
               ],
             ),
@@ -144,14 +168,15 @@ class _LoginPageState extends State<LoginPage> {
 class GoogleAuthService {
   handleAuthState() {
     return StreamBuilder(
-        stream: FirebaseAuth.instance.authStateChanges(),
-        builder: (BuildContext context, currAuthState) {
-          if (currAuthState.hasData) {
-            return const Menu();
-          } else {
-            return const LoginPage();
-          }
-        });
+      stream: FirebaseAuth.instance.authStateChanges(),
+      builder: (BuildContext context, currAuthState) {
+        if (currAuthState.hasData) {
+          return const Menu();
+        } else {
+          return const LoginPage();
+        }
+      },
+    );
   }
 
   signIn() async {
@@ -163,7 +188,7 @@ class GoogleAuthService {
     final credential = GoogleAuthProvider.credential(
         accessToken: auth.accessToken, idToken: auth.idToken);
 
-    return await FirebaseAuth.instance
+    await FirebaseAuth.instance
         .signInWithCredential(credential)
         .then((value) async {
       var loginUser = {
@@ -183,44 +208,18 @@ class GoogleAuthService {
 
       AuthUser user = AuthUser.fromJson(loginUser);
 
-      users
-          .where('email', isEqualTo: FirebaseAuth.instance.currentUser!.email)
-          .get()
-          .then((value) async {
-        if (value.docs.isEmpty) {
-          await users
-              .add(user.toJson())
-              .then((value) {})
-              .catchError((error) {});
-        } else {
-          await users
-              .doc(value.docs.first.id)
-              .update({"isActive": true})
-              .then((value) {})
-              .catchError((error) {});
-        }
-      });
+      QuerySnapshot value = await users.where('email', isEqualTo: FirebaseAuth.instance.currentUser!.email).get();
+      if (value.docs.isEmpty) {
+        await users.add(user.toJson()).then((value) {}).catchError((error) {});
+      } else {
+        await users.doc(value.docs.first.id).update({"isActive": true}).then((value) {}).catchError((error) {});
+      }
     });
   }
 
   signOut() async {
-    CollectionReference users = FirebaseFirestore.instance.collection('users');
-    await users
-        .where('email', isEqualTo: FirebaseAuth.instance.currentUser!.email)
-        .get()
-        .then((value) async {
-      if (value.docs.isNotEmpty) {
-        await users
-            .doc(value.docs.first.id)
-            .update({"isActive": false}).then((value) {
-          FirebaseAuth.instance.signOut();
-        }).catchError((error) {});
-      }
-    });
+    await FirebaseAuth.instance.signOut();
   }
-// signOut() async {
-//   await FirebaseAuth.instance.signOut();
-// }
 
 }
 
@@ -255,14 +254,12 @@ class AppleAuthService {
       await FirebaseAuth.instance.signInWithCredential(authCredential);
 
       var email = FirebaseAuth.instance.currentUser!.email;
-      var photoURL = FirebaseAuth.instance.currentUser!.photoURL;
-
       var parts = email != null ? email.split('@') : [];
+      var username = parts.isNotEmpty ? parts[0] : 'user';
 
-      var displayName = parts.isNotEmpty ? parts[0] : 'user';
-
+      var photoURL = FirebaseAuth.instance.currentUser!.photoURL;
       if (photoURL == null) {
-        photoURL = 'https://i.pinimg.com/736x/6b/ed/12/6bed123accf95b38fb97e32f39df4c2e.jpg';
+        photoURL = 'https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_960_720.png';
       }
 
       var loginUser = {
@@ -270,7 +267,7 @@ class AppleAuthService {
         "myMoney": 0.0,
         "myBadge": "None",
         "BadgeList": [],
-        "displayName": displayName,
+        "displayName": credential.givenName != null ? '${credential.givenName} ${credential.familyName}' : username,
         "isActive": true,
         "email": FirebaseAuth.instance.currentUser!.email,
         "created_at": DateTime.now().toString(),
@@ -299,4 +296,112 @@ class AppleAuthService {
     }
   }
 
+}
+
+class Deletion {
+  accountDeletion(BuildContext context) {
+    showDialog(
+      barrierDismissible: false,
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text('Are you sure you want to delete your account?'),
+            Text(
+              'If you click on the yes button, your information will automatically be deleted and you will be redirected to the login page.',
+              style: TextStyle(
+                fontSize: 12,
+                color: Colors.black,
+              ),
+            ),
+            Text(
+              'In case you accidentally delete your account, contact pomoduel@gmail.com with the same email address you logged in with.',
+              style: TextStyle(
+                fontSize: 12,
+                color: Colors.black,
+              ),
+            ),
+          ],
+        ),
+        actions: [
+          Row(
+            children: [
+              Expanded(
+                child: TextButton(
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
+                  style: ButtonStyle(
+                    minimumSize: MaterialStateProperty.all(
+                      Size(MediaQuery.of(context).size.width * 0.85, 40),
+                    ),
+                    foregroundColor: MaterialStateProperty.all(Colors.white),
+                    backgroundColor: MaterialStateProperty.all(Colors.green),
+                  ),
+                  child: const Text('No :)'),
+                ),
+              ),
+              const SizedBox(
+                width: 10,
+              ),
+              Expanded(
+                child: TextButton(
+                  onPressed: () async {
+                    QuerySnapshot snapshot = await FirebaseFirestore.instance
+                        .collection('users')
+                        .where('email', isEqualTo: FirebaseAuth.instance.currentUser!.email)
+                        .get();
+
+                    Map<String, dynamic>? userData = snapshot.docs.first.data() as Map<String, dynamic>?;
+
+                    if (userData != null) {
+                      await FirebaseFirestore.instance
+                          .collection('delete')
+                          .doc(snapshot.docs.first.id)
+                          .set(userData);
+
+                      await FirebaseFirestore.instance
+                          .collection('users')
+                          .doc(snapshot.docs.first.id)
+                          .delete();
+
+                      QuerySnapshot challengesSnapshot = await FirebaseFirestore.instance
+                          .collection('challenge')
+                          .where('acceptorEmail', isEqualTo: FirebaseAuth.instance.currentUser!.email)
+                          .get();
+
+                      QuerySnapshot challengesSnapshot2 = await FirebaseFirestore.instance
+                          .collection('challenge')
+                          .where('requesterEmail', isEqualTo: FirebaseAuth.instance.currentUser!.email)
+                          .get();
+
+                      List<DocumentSnapshot> allDocuments = [...challengesSnapshot.docs, ...challengesSnapshot2.docs];
+
+                      for (DocumentSnapshot challengeDoc in allDocuments) {
+                        await challengeDoc.reference.delete();
+                      }
+                    }
+
+                    await FirebaseAuth.instance.signOut();
+
+                    Navigator.of(context).popUntil((route) => route.isFirst);
+                    Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => AppleAuthService().handleAuthState()));
+                  },
+                  style: ButtonStyle(
+                    minimumSize: MaterialStateProperty.all(
+                      Size(MediaQuery.of(context).size.width * 0.85, 40),
+                    ),
+                    foregroundColor: MaterialStateProperty.all(Colors.white),
+                    backgroundColor: MaterialStateProperty.all(Colors.red.shade900),
+                  ),
+                  child: const Text('Yes :('),
+                ),
+              )
+            ],
+          ),
+        ],
+      ),
+    );
+  }
 }

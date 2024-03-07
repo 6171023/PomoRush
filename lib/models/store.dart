@@ -40,8 +40,8 @@ class Store {
 
   void _initializeAvailableBadges() {
     _availableBadges = [
-      StoreBadge(name: 'Rookie', price: 100.0, imagePath: 'assets/rookie.png', isEquipped: false, isPurchased: false),
-      StoreBadge(name: 'Veteran', price: 500.0, imagePath: 'assets/veteran.png', isEquipped: false, isPurchased: false),
+      StoreBadge(name: 'Beginner', price: 100.0, imagePath: 'assets/beginner.png', isEquipped: false, isPurchased: false),
+      StoreBadge(name: 'Advanced', price: 500.0, imagePath: 'assets/advanced.png', isEquipped: false, isPurchased: false),
       StoreBadge(name: 'Elite', price: 1000.0, imagePath: 'assets/elite.png', isEquipped: false, isPurchased: false),
       StoreBadge(name: 'Pro', price: 1500.0, imagePath: 'assets/pro.png', isEquipped: false, isPurchased: false),
       StoreBadge(name: 'Master', price: 2000.0, imagePath: 'assets/master.png', isEquipped: false, isPurchased: false),

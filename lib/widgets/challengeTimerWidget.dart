@@ -369,14 +369,23 @@ class _ChallengeTimerWidgetState extends State<ChallengeTimerWidget> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          FirebaseAuth.instance.currentUser!.email == chal.acceptorEmail
-              ? Text(chal.requesterCurrentState, style: TextStyle(color: Colors.greenAccent, fontSize: 15.0))
-              : Text(chal.acceptorCurrentState, style: TextStyle(color: Colors.limeAccent, fontSize: 15.0)),
-          FirebaseAuth.instance.currentUser!.email == chal.acceptorEmail
-              ? Text(chal.requesterCurrentTimer, style: TextStyle(color: Colors.greenAccent, fontSize: 25.0))
-              : Text(chal.acceptorCurrentTimer, style: TextStyle(color: Colors.limeAccent, fontSize: 25.0))
+          Text(
+            chal.acceptorCurrentState,
+            style: TextStyle(
+                color: chal.acceptorCurrentState == 'Focus' ? Colors.greenAccent : Colors.limeAccent,
+                fontSize: 15.0
+            ),
+          ),
+          Text(
+            chal.acceptorCurrentTimer,
+            style: TextStyle(
+                color: chal.acceptorCurrentState == 'Focus' ? Colors.greenAccent : Colors.limeAccent,
+                fontSize: 25.0
+            ),
+          )
         ],
       ),
     ),
   );
+
 }

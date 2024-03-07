@@ -285,7 +285,7 @@ class _StoreScreenState extends State<StoreScreen> {
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Not enough money to purchase ${badge.name} :('),
+            content: Text('Not enough money to purchase Badge ${badge.name} :('),
             duration: const Duration(seconds: 3),
           ),
         );
@@ -294,7 +294,7 @@ class _StoreScreenState extends State<StoreScreen> {
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('Oops! Not enough to purchase ${badge.name} :( Earn enough money by using the timer!'),
+          content: Text('Oops! Unable to purchase Badge ${badge.name}. Earn enough money by using the timer!'),
           duration: const Duration(seconds: 3),
         ),
       );
