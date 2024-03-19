@@ -265,7 +265,12 @@ class _MoneyTimerWidgetState extends State<MoneyTimerWidget> {
           ),
           const SizedBox(height: 5.0),
           Text(
-            'Access the money earning Pomodoro timer from the button below to earn money. You will earn money that is half of your focus minutes value.',
+            'Use this money earning Pomodoro timer to earn money.',
+            textAlign: TextAlign.start,
+          ),
+          const SizedBox(height: 5,),
+          Text(
+            'You will earn money that is half of your focus minutes value which you can later use to buy badges.',
             textAlign: TextAlign.start,
           ),
           const SizedBox(height: 5,),

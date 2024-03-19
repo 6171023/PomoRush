@@ -82,17 +82,10 @@ class _LeaderBoardState extends State<LeaderBoard> {
                                               CircleAvatar(
                                                   child: Container(
                                                       decoration: BoxDecoration(
-                                                          shape: BoxShape
-                                                              .circle,
+                                                          shape: BoxShape.circle,
                                                           image: DecorationImage(
-                                                              image: NetworkImage(
-                                                                  snapshot.data!
-                                                                      .docs[
-                                                                  index]
-                                                                  [
-                                                                  "photoURL"]),
-                                                              fit: BoxFit
-                                                                  .fill)))),
+                                                              image: NetworkImage(snapshot.data!.docs[index]["photoURL"]),
+                                                              fit: BoxFit.fill)))),
                                             ],
                                           ),
                                         ),
@@ -108,9 +101,7 @@ class _LeaderBoardState extends State<LeaderBoard> {
                                               Container(
                                                   alignment:
                                                   Alignment.centerLeft,
-                                                  child: Text(
-                                                    snapshot.data!.docs[index]
-                                                    ['displayName'],
+                                                  child: Text(snapshot.data!.docs[index]['displayName'],
                                                     style: const TextStyle(
                                                         color:
                                                         Colors.black,

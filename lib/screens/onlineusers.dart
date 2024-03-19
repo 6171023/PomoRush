@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:pomo_rush/models/user.dart';
+import 'package:pomo_rush/models/challenge.dart';
 import 'package:pomo_rush/utils/preferences.dart';
 
 class OnlineActiveUsers extends StatefulWidget {
@@ -16,9 +17,14 @@ class _OnlineActiveUsersState extends State<OnlineActiveUsers> {
 
   Stream<List<AuthUser>> readUsers() => FirebaseFirestore.instance
       .collection('users')
+      .orderBy('displayName', descending: false)
       .snapshots()
-      .map((snapshot) =>
-      snapshot.docs.map((doc) => AuthUser.fromJson(doc.data())).toList());
+      .map((snapshot) => snapshot.docs
+      .map((doc) => AuthUser.fromJson(doc.data()))
+      .toList());
+
+  late DateTime createdAt;
+  late String winner = '';
   late String acceptorEmail = '';
   late String acceptorName = '';
   late String acceptorEndTime = '';
@@ -34,9 +40,11 @@ class _OnlineActiveUsersState extends State<OnlineActiveUsers> {
     setState(() {
       isloading = true;
     });
-    CollectionReference challenge =
-    FirebaseFirestore.instance.collection('challenge');
+    CollectionReference challenge = FirebaseFirestore.instance.collection('challenge');
+    DateTime now = DateTime.now();
     var data = {
+      "createdAt": now,
+      "winner": winner,
       "acceptorDisplayName": acceptorName,
       "requesterDisplayName": FirebaseAuth.instance.currentUser!.displayName,
       "acceptorEmail": acceptorEmail,
@@ -83,7 +91,6 @@ class _OnlineActiveUsersState extends State<OnlineActiveUsers> {
     });
   }
 
-  //input for focus minutes
   late TextEditingController focusMinutes = TextEditingController(text: "25");
   late TextEditingController breaktime = TextEditingController(text: "5");
   late TextEditingController sets = TextEditingController(text: "4");
@@ -248,18 +255,41 @@ class _OnlineActiveUsersState extends State<OnlineActiveUsers> {
     return isloading
         ? const Center(child: CircularProgressIndicator())
         : StreamBuilder<List<AuthUser>>(
-        stream: readUsers(),
-        builder: (context, snapshot) {
-          if (snapshot.hasData) {
-            final users = snapshot.data!;
-
-            return ListView(
-              children: users.map(buildUser).toList(),
-            );
-          } else {
-            return const Center(child: CircularProgressIndicator());
-          }
-        });
+      stream: readUsers(),
+      builder: (context, snapshot) {
+        if (snapshot.hasData) {
+          final users = snapshot.data!;
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: <Widget>[
+              const SizedBox(
+                height: 20,
+              ),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                child: Text(
+                  'Use the request button to send challenges to anyone here and use the challenge screen to view your request status and/or participate in the accepted challenges.',
+                  style: TextStyle(fontSize: 15.0),
+                ),
+              ),
+              const SizedBox(
+                height: 10,
+              ),
+              Expanded(
+                child: ListView.builder(
+                  itemCount: users.length,
+                  itemBuilder: (context, index) {
+                    return buildUser(users[index]);
+                  },
+                ),
+              ),
+            ],
+          );
+        } else {
+          return const Center(child: CircularProgressIndicator());
+        }
+      },
+    );
   }
 
   Widget buildUser(AuthUser user) => Stack(
@@ -275,7 +305,12 @@ class _OnlineActiveUsersState extends State<OnlineActiveUsers> {
                 ),
                 title: Row(
                   children: [
-                    Text(user.displayName),
+                    Flexible(
+                      child: Text(
+                        user.displayName,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
                     SizedBox(width: 5),
                     user.email == FirebaseAuth.instance.currentUser!.email
                         ? Container(

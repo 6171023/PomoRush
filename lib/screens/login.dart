@@ -92,7 +92,7 @@ class _LoginPageState extends State<LoginPage> {
                             text: 'IMPORTANT: ',
                             style: TextStyle(fontWeight: FontWeight.bold),
                           ),
-                          TextSpan(text: '\n'), // Add a new line
+                          TextSpan(text: '\n'),
                           TextSpan(
                             text: 'Please keep in mind that your *name* will be displayed on the global leaderboard that is accessible to ALL other users and your *email* will be displayed to other users you challenge.',
                           ),

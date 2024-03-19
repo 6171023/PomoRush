@@ -188,8 +188,7 @@ class _ChallengeTimerWidgetState extends State<ChallengeTimerWidget> {
           ],
           content: const SingleChildScrollView(
             child: Text(
-              'Keep this screen open. After starting the timer, you will not be able to stop it. If this page will be closed, you will be required to start from the beginning for the challenge. Your opponent will be watching your timer in real time. Points will be recorded after completion of the challenge. Good luck!',
-            ),
+              'Keep this screen open. \nYou will not be able to stop the timer once it starts. \nYou will be required to start from the beginning for the challenge if this page closes. \nYour opponent will be able to watch your timer in real time. \nPoints will be recorded as you participate in the challenge. \nGood luck!',            ),
           ),
         ));
   }
@@ -239,10 +238,10 @@ class _ChallengeTimerWidgetState extends State<ChallengeTimerWidget> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-          backgroundColor: Styles.pomodoroPrimaryColor,
-          title: const Text('Pomodoro Challenge',
-              style: TextStyle(color:Colors.white,)
-          ),
+        backgroundColor: Styles.pomodoroPrimaryColor,
+        title: const Text('Pomodoro Challenge',
+            style: TextStyle(color:Colors.white,)
+        ),
         leading: IconButton(
           icon: Icon(Icons.arrow_back, color: Colors.white),
           onPressed: () => Navigator.pop(context),

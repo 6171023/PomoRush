@@ -2,6 +2,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 
 class Challenge {
   String id;
+  DateTime createdAt;
+  String winner;
   String acceptorDisplayName;
   String requesterDisplayName;
   String acceptorEmail;
@@ -29,7 +31,9 @@ class Challenge {
   String acceptorState;
 
   Challenge(
-      {required this.id,
+      {required this.createdAt,
+        required this.winner,
+        required this.id,
         required this.acceptorDisplayName,
         required this.acceptorEmail,
         required this.acceptorEndTime,
@@ -53,10 +57,11 @@ class Challenge {
         required this.acceptorState});
 
   toJson() => {
+    "createdAt": createdAt.toString(),
+    "winner": FirebaseAuth.instance.currentUser!,
     "id": id,
     "acceptorDisplayName": acceptorDisplayName,
-    "requesterDisplayName":
-    FirebaseAuth.instance.currentUser!.displayName,
+    "requesterDisplayName": requesterDisplayName,
     "acceptorEmail": acceptorEmail,
     "acceptorEndTime": acceptorEndTime,
     "breakTime": breakTime,
@@ -80,6 +85,8 @@ class Challenge {
 
   factory Challenge.fromJson(Map<String, dynamic> json, String docId) =>
       Challenge(
+          createdAt: DateTime.now(),
+          winner: json['winner'],
           id: docId,
           acceptorDisplayName: json["acceptorDisplayName"],
           acceptorEmail: json["acceptorEmail"],

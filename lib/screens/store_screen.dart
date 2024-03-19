@@ -75,7 +75,7 @@ class _StoreScreenState extends State<StoreScreen> {
                             ],
                           );
                         } else {
-                          return Text('Equipped badge: ${badgeSnapshot.data}',
+                          return Text('Equipped Badge: ${badgeSnapshot.data}',
                             style: TextStyle(fontSize: 18.0),
                           );
                         }
