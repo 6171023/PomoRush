@@ -35,6 +35,38 @@ class _ChallengeListScreenState extends State<ChallengeListScreen> {
     return querySnapshot.docs.isNotEmpty;
   }
 
+  _assignWinner(String docId, String winnerEmail) async {
+    setState(() {
+      isLoading = true;
+    });
+
+    CollectionReference challenge = FirebaseFirestore.instance.collection('challenge');
+
+    try {
+      // Update the winner field in the challenge document
+      await challenge.doc(docId).update({
+        "winner": winnerEmail,
+      });
+
+      setState(() {
+        isLoading = false;
+      });
+
+      // Optionally, you can perform additional actions after assigning the winner
+
+    } catch (error) {
+      setState(() {
+        isLoading = false;
+      });
+      AppResponse.showAlertBottomSheet(
+        title: 'Failed',
+        message: "Something went wrong. Failed to assign winner.",
+        context: context,
+        color: Colors.red,
+      );
+    }
+  }
+
   _startChallenge(String docId, Challenge chlg) async {
     setState(() {
       isLoading = true;
@@ -48,22 +80,6 @@ class _ChallengeListScreenState extends State<ChallengeListScreen> {
         "startedBy": FirebaseAuth.instance.currentUser!.email,
       });
 
-      // Determine the winner if one of the users has completed the challenge
-      if (chlg.acceptorEmail == FirebaseAuth.instance.currentUser!.email &&
-          chlg.acceptorState == "Done" &&
-          chlg.requesterState != "Done") {
-        // If the acceptor finished the challenge first, they are the winner
-        await challenge.doc(docId).update({
-          "winner": FirebaseAuth.instance.currentUser!.email,
-        });
-      } else if (chlg.requesterEmail == FirebaseAuth.instance.currentUser!.email &&
-          chlg.requesterState == "Done" &&
-          chlg.acceptorState != "Done") {
-        // If the requester finished the challenge first, they are the winner
-        await challenge.doc(docId).update({
-          "winner": FirebaseAuth.instance.currentUser!.email,
-        });
-      }
 
       setState(() {
         isLoading = false;
@@ -75,9 +91,6 @@ class _ChallengeListScreenState extends State<ChallengeListScreen> {
           builder: (context) => ChallengeTimerWidget(challenge: chlg),
         ),
       );
-
-      // // Listen for challenge updates
-      // _listenForChallengeUpdates(docId);
 
     } catch (error) {
       setState(() {
@@ -158,7 +171,44 @@ class _ChallengeListScreenState extends State<ChallengeListScreen> {
                         ),
                       ),
                     ),
-                    if (challenge.status == "accepted")
+
+                    if (challenge.status == "requested")
+                      Container(
+                        padding: const EdgeInsets.all(5.0),
+                        decoration: BoxDecoration(
+                          color: Colors.black,
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                        child: Center(
+                          child: Text(
+                            "Requested  \n ${challenge.focusTime}-${challenge.breakTime}-${challenge.setCount} ",                          style: TextStyle(
+                              color: Colors.greenAccent,
+                            ),
+                          ),
+                        ),
+                      )
+
+                    else if (challenge.status == "request" && challenge.acceptorEmail == FirebaseAuth.instance.currentUser!.email)
+                      ElevatedButton(
+                        onPressed: () {
+                          _acceptChallenge(challenge.id);
+                        },
+                        style: OutlinedButton.styleFrom(
+                          foregroundColor: Colors.white,
+                          backgroundColor: Colors.blue,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(5),
+                          ),
+                        ),
+                        child: Center(
+                          child: Text(
+                            ' Accept  \n ${challenge.focusTime}-${challenge.breakTime}-${challenge.setCount} ',
+                            textAlign: TextAlign.center,
+                          ),
+                        ),
+                      )
+
+                    else if (challenge.status == "accepted")
                       TextButton(
                         onPressed: () {
                           _startChallenge(challenge.id, challenge);
@@ -180,33 +230,13 @@ class _ChallengeListScreenState extends State<ChallengeListScreen> {
                           ),
                         ),
                       )
-                    else if (challenge.status == "request" &&
-                        challenge.acceptorEmail == FirebaseAuth.instance.currentUser!.email)
-                      ElevatedButton(
-                        onPressed: () {
-                          _acceptChallenge(challenge.id);
-                        },
-                        style: OutlinedButton.styleFrom(
-                          foregroundColor: Colors.white,
-                          backgroundColor: Colors.blue,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(5),
-                          ),
-                        ),
-                        child: Center(
-                          child: Text(
-                            ' Accept  \n ${challenge.focusTime}-${challenge.breakTime}-${challenge.setCount} ',
-                            textAlign: TextAlign.center,
-                          ),
-                        ),
-                      )
-                    else if ((challenge.acceptorEmail == FirebaseAuth.instance.currentUser!.email &&
-                          challenge.acceptorState == "Done" &&
-                          challenge.winner == FirebaseAuth.instance.currentUser!.email) ||
-                          (challenge.requesterEmail == FirebaseAuth.instance.currentUser!.email &&
-                              challenge.requesterState == "Done" &&
-                              challenge.winner == FirebaseAuth.instance.currentUser!.email))
-                        Container(
+
+                    else if ((challenge.acceptorState == "Done" && challenge.requesterState != "Done") ||
+                            (challenge.acceptorState != "Done" && challenge.requesterState == "Done") ||
+                            (challenge.acceptorState != "Done" && challenge.requesterState != "Done"))
+                      if (challenge.acceptorEmail == FirebaseAuth.instance.currentUser!.email && challenge.acceptorState == "Done" && challenge.requesterState != "Done")
+                        _assignWinner(challenge.id, challenge.acceptorEmail),
+                          Container(
                           padding: const EdgeInsets.all(5.0),
                           decoration: BoxDecoration(
                             color: Colors.black,
@@ -220,10 +250,25 @@ class _ChallengeListScreenState extends State<ChallengeListScreen> {
                               ),
                             ),
                           ),
-                        )
-                      else if ((challenge.acceptorState == "Done" || challenge.requesterState == "Done") &&
-                            !(challenge.acceptorState == "Done" && challenge.requesterState == "Done"))
-                        // Display "Open" if either acceptor or requester has completed the challenge but not both
+                          )
+                      else if (challenge.requesterEmail == FirebaseAuth.instance.currentUser!.email && challenge.requesterState == "Done" && challenge.acceptorState != "Done")
+                        _assignWinner(challenge.id, challenge.requesterEmail),
+                          Container(
+                            padding: const EdgeInsets.all(5.0),
+                            decoration: BoxDecoration(
+                              color: Colors.black,
+                              borderRadius: BorderRadius.circular(20),
+                            ),
+                            child: Center(
+                              child: Text(
+                                ' WIN \n ${challenge.focusTime}-${challenge.breakTime}-${challenge.setCount} ',
+                              style: TextStyle(
+                              color: Colors.greenAccent,
+                              ),
+                             ),
+                            ),
+                          )
+                      else if (challenge.acceptorState != "Done" && challenge.requesterState != "Done")
                           OutlinedButton(
                             onPressed: () {
                               Navigator.push(
@@ -247,8 +292,8 @@ class _ChallengeListScreenState extends State<ChallengeListScreen> {
                               ),
                             ),
                           )
-                          else if (challenge.status=="started" && challenge.winner!=FirebaseAuth.instance.currentUser!.email)
-                          // Display LOSS as the user has finished the challenge but hasn't won
+                        else
+                          if (challenge.winner==FirebaseAuth.instance.currentUser!.email)
                             Container(
                               padding: const EdgeInsets.all(5.0),
                               decoration: BoxDecoration(
@@ -257,30 +302,30 @@ class _ChallengeListScreenState extends State<ChallengeListScreen> {
                               ),
                               child: Center(
                                 child: Text(
-                                  ' LOSS \n ${challenge.focusTime}-${challenge.breakTime}-${challenge.setCount}  ',
+                                  ' WIN \n ${challenge.focusTime}-${challenge.breakTime}-${challenge.setCount}  ',
                                   style: TextStyle(
-                                    color: Colors.redAccent,
+                                    color: Colors.greenAccent,
                                   ),
                                 ),
                               ),
                             )
-                        else
-                          Container(
-                            padding: const EdgeInsets.all(5.0),
-                            decoration: BoxDecoration(
-                              color: Colors.black,
-                              borderRadius: BorderRadius.circular(20),
-                            ),
-                            child: Center(
-                              child: Text(
-                                challenge.status == "request"
-                                    ? "Requested  \n ${challenge.focusTime}-${challenge.breakTime}-${challenge.setCount} "
-                                    : challenge.status,
-                                textAlign: TextAlign.center,
-                                style: const TextStyle(color: Colors.white),
+                            else
+                              Container(
+                              padding: const EdgeInsets.all(5.0),
+                              decoration: BoxDecoration(
+                                color: Colors.black,
+                                borderRadius: BorderRadius.circular(20),
+                               ),
+                              child: Center(
+                                child: Text(
+                                  ' LOSS \n ${challenge.focusTime}-${challenge.breakTime}-${challenge.setCount}  ',
+                                style: TextStyle(
+                                  color: Colors.redAccent,
+                                ),
                               ),
                             ),
-                          ),
+                          )
+
                   ],
                 ),
               ],
