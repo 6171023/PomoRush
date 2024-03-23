@@ -35,45 +35,12 @@ class _ChallengeListScreenState extends State<ChallengeListScreen> {
     return querySnapshot.docs.isNotEmpty;
   }
 
-  _assignWinner(String docId, String winnerEmail) async {
-    setState(() {
-      isLoading = true;
-    });
-
-    CollectionReference challenge = FirebaseFirestore.instance.collection('challenge');
-
-    try {
-      // Update the winner field in the challenge document
-      await challenge.doc(docId).update({
-        "winner": winnerEmail,
-      });
-
-      setState(() {
-        isLoading = false;
-      });
-
-      // Optionally, you can perform additional actions after assigning the winner
-
-    } catch (error) {
-      setState(() {
-        isLoading = false;
-      });
-      AppResponse.showAlertBottomSheet(
-        title: 'Failed',
-        message: "Something went wrong. Failed to assign winner.",
-        context: context,
-        color: Colors.red,
-      );
-    }
-  }
-
   _startChallenge(String docId, Challenge chlg) async {
     setState(() {
       isLoading = true;
     });
 
     CollectionReference challenge = FirebaseFirestore.instance.collection('challenge');
-
     try {
       await challenge.doc(docId).update({
         "status": "started",
@@ -157,175 +124,19 @@ class _ChallengeListScreenState extends State<ChallengeListScreen> {
                     Expanded(
                       child: ListTile(
                         title: Text(
-                          // Display the other person's display name
                           challenge.acceptorEmail == FirebaseAuth.instance.currentUser!.email
                               ? challenge.requesterDisplayName
                               : challenge.acceptorDisplayName,
                           overflow: TextOverflow.ellipsis,
                         ),
                         subtitle: Text(
-                          // Display the other person's email address
                           challenge.acceptorEmail == FirebaseAuth.instance.currentUser!.email
                               ? challenge.requesterEmail
                               : challenge.acceptorEmail,
                         ),
                       ),
                     ),
-
-                    if (challenge.status == "requested")
-                      Container(
-                        padding: const EdgeInsets.all(5.0),
-                        decoration: BoxDecoration(
-                          color: Colors.black,
-                          borderRadius: BorderRadius.circular(20),
-                        ),
-                        child: Center(
-                          child: Text(
-                            "Requested  \n ${challenge.focusTime}-${challenge.breakTime}-${challenge.setCount} ",                          style: TextStyle(
-                              color: Colors.greenAccent,
-                            ),
-                          ),
-                        ),
-                      )
-
-                    else if (challenge.status == "request" && challenge.acceptorEmail == FirebaseAuth.instance.currentUser!.email)
-                      ElevatedButton(
-                        onPressed: () {
-                          _acceptChallenge(challenge.id);
-                        },
-                        style: OutlinedButton.styleFrom(
-                          foregroundColor: Colors.white,
-                          backgroundColor: Colors.blue,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(5),
-                          ),
-                        ),
-                        child: Center(
-                          child: Text(
-                            ' Accept  \n ${challenge.focusTime}-${challenge.breakTime}-${challenge.setCount} ',
-                            textAlign: TextAlign.center,
-                          ),
-                        ),
-                      )
-
-                    else if (challenge.status == "accepted")
-                      TextButton(
-                        onPressed: () {
-                          _startChallenge(challenge.id, challenge);
-                        },
-                        style: ButtonStyle(
-                          foregroundColor: MaterialStateProperty.all(Colors.white),
-                          backgroundColor: MaterialStateProperty.all(Colors.green),
-                          elevation: MaterialStateProperty.all(5),
-                          shape: MaterialStateProperty.all<RoundedRectangleBorder>(
-                            RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(5),
-                            ),
-                          ),
-                        ),
-                        child: Center(
-                          child: Text(
-                            ' Start  \n ${challenge.focusTime}-${challenge.breakTime}-${challenge.setCount} ',
-                            textAlign: TextAlign.center,
-                          ),
-                        ),
-                      )
-
-                    else if ((challenge.acceptorState == "Done" && challenge.requesterState != "Done") ||
-                            (challenge.acceptorState != "Done" && challenge.requesterState == "Done") ||
-                            (challenge.acceptorState != "Done" && challenge.requesterState != "Done"))
-                      if (challenge.acceptorEmail == FirebaseAuth.instance.currentUser!.email && challenge.acceptorState == "Done" && challenge.requesterState != "Done")
-                        _assignWinner(challenge.id, challenge.acceptorEmail),
-                          Container(
-                          padding: const EdgeInsets.all(5.0),
-                          decoration: BoxDecoration(
-                            color: Colors.black,
-                            borderRadius: BorderRadius.circular(20),
-                          ),
-                          child: Center(
-                            child: Text(
-                              ' WIN \n ${challenge.focusTime}-${challenge.breakTime}-${challenge.setCount} ',
-                              style: TextStyle(
-                                color: Colors.greenAccent,
-                              ),
-                            ),
-                          ),
-                          )
-                      else if (challenge.requesterEmail == FirebaseAuth.instance.currentUser!.email && challenge.requesterState == "Done" && challenge.acceptorState != "Done")
-                        _assignWinner(challenge.id, challenge.requesterEmail),
-                          Container(
-                            padding: const EdgeInsets.all(5.0),
-                            decoration: BoxDecoration(
-                              color: Colors.black,
-                              borderRadius: BorderRadius.circular(20),
-                            ),
-                            child: Center(
-                              child: Text(
-                                ' WIN \n ${challenge.focusTime}-${challenge.breakTime}-${challenge.setCount} ',
-                              style: TextStyle(
-                              color: Colors.greenAccent,
-                              ),
-                             ),
-                            ),
-                          )
-                      else if (challenge.acceptorState != "Done" && challenge.requesterState != "Done")
-                          OutlinedButton(
-                            onPressed: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => ChallengeTimerWidget(challenge: challenge),
-                                ),
-                              );
-                            },
-                            style: OutlinedButton.styleFrom(
-                              foregroundColor: Colors.white,
-                              backgroundColor: Colors.green,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(5),
-                              ),
-                            ),
-                            child: Center(
-                              child: Text(
-                                ' Open \n ${challenge.focusTime}-${challenge.breakTime}-${challenge.setCount} ',
-                                textAlign: TextAlign.center,
-                              ),
-                            ),
-                          )
-                        else
-                          if (challenge.winner==FirebaseAuth.instance.currentUser!.email)
-                            Container(
-                              padding: const EdgeInsets.all(5.0),
-                              decoration: BoxDecoration(
-                                color: Colors.black,
-                                borderRadius: BorderRadius.circular(20),
-                              ),
-                              child: Center(
-                                child: Text(
-                                  ' WIN \n ${challenge.focusTime}-${challenge.breakTime}-${challenge.setCount}  ',
-                                  style: TextStyle(
-                                    color: Colors.greenAccent,
-                                  ),
-                                ),
-                              ),
-                            )
-                            else
-                              Container(
-                              padding: const EdgeInsets.all(5.0),
-                              decoration: BoxDecoration(
-                                color: Colors.black,
-                                borderRadius: BorderRadius.circular(20),
-                               ),
-                              child: Center(
-                                child: Text(
-                                  ' LOSS \n ${challenge.focusTime}-${challenge.breakTime}-${challenge.setCount}  ',
-                                style: TextStyle(
-                                  color: Colors.redAccent,
-                                ),
-                              ),
-                            ),
-                          )
-
+                    ..._buildChallengeActions(challenge),
                   ],
                 ),
               ],
@@ -336,6 +147,181 @@ class _ChallengeListScreenState extends State<ChallengeListScreen> {
         }
       },
     );
+  }
+
+  List<Widget> _buildChallengeActions(Challenge challenge) {
+    if (challenge.status == "request" && challenge.requesterEmail == FirebaseAuth.instance.currentUser!.email) {
+      return [
+        Container(
+          padding: const EdgeInsets.all(5.0),
+          decoration: BoxDecoration(
+            color: Colors.black,
+            borderRadius: BorderRadius.circular(20),
+          ),
+          child: Center(
+            child: Text(
+              "Requested \n ${challenge.focusTime}-${challenge.breakTime}-${challenge.setCount} ",
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                color: Colors.white,
+              ),
+            ),
+          ),
+        ),
+      ];
+    } else if (challenge.status == "request" && challenge.acceptorEmail == FirebaseAuth.instance.currentUser!.email) {
+      return [
+        ElevatedButton(
+          onPressed: () {
+            _acceptChallenge(challenge.id);
+          },
+          style: OutlinedButton.styleFrom(
+            foregroundColor: Colors.white,
+            backgroundColor: Colors.blue,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(5),
+            ),
+          ),
+          child: Center(
+            child: Text(
+              ' Accept \n ${challenge.focusTime}-${challenge.breakTime}-${challenge.setCount} ',
+              textAlign: TextAlign.center,
+            ),
+          ),
+        ),
+      ];
+    } else if (challenge.status == "accepted") {
+      return [
+        ElevatedButton(
+          onPressed: () {
+            _startChallenge(challenge.id, challenge);
+          },
+          style: OutlinedButton.styleFrom(
+            foregroundColor: Colors.white,
+            backgroundColor: Colors.green,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(5),
+            ),
+          ),
+          child: Center(
+            child: Text(
+              ' Open \n ${challenge.focusTime}-${challenge.breakTime}-${challenge.setCount} ',
+              textAlign: TextAlign.center,
+            ),
+          ),
+        ),
+      ];
+    } else if (challenge.acceptorEmail == FirebaseAuth.instance.currentUser!.email &&
+        challenge.acceptorState == "Done" && challenge.requesterState != "Done") {
+      CollectionReference challengeCollection = FirebaseFirestore.instance.collection('challenge');
+      challengeCollection.doc(challenge.id).update({"winner": challenge.acceptorEmail,});
+      return [
+        Container(
+          padding: const EdgeInsets.all(5.0),
+          decoration: BoxDecoration(
+            color: Colors.black,
+            borderRadius: BorderRadius.circular(20),
+          ),
+          child: Center(
+            child: Text(
+              'WIN \n ${challenge.focusTime}-${challenge.breakTime}-${challenge.setCount} ',
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                color: Colors.greenAccent,
+              ),
+            ),
+          ),
+        ),
+      ];
+    } else if (challenge.requesterEmail == FirebaseAuth.instance.currentUser!.email &&
+        challenge.requesterState == "Done" && challenge.acceptorState != "Done") {
+      CollectionReference challengeCollection = FirebaseFirestore.instance.collection('challenge');
+      challengeCollection.doc(challenge.id).update({"winner": challenge.requesterEmail,});
+      return [
+        Container(
+          padding: const EdgeInsets.all(5.0),
+          decoration: BoxDecoration(
+            color: Colors.black,
+            borderRadius: BorderRadius.circular(20),
+          ),
+          child: Center(
+            child: Text(
+              'WIN \n ${challenge.focusTime}-${challenge.breakTime}-${challenge.setCount} ',
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                color: Colors.greenAccent,
+              ),
+            ),
+          ),
+        ),
+      ];
+    } else if ((challenge.acceptorState != "Done" && challenge.requesterState != "Done") ||
+        (challenge.acceptorEmail == FirebaseAuth.instance.currentUser!.email && challenge.acceptorState != "Done" && challenge.requesterState == "Done") ||
+        (challenge.requesterEmail == FirebaseAuth.instance.currentUser!.email && challenge.acceptorState == "Done" && challenge.requesterState != "Done")) {
+      return [
+        ElevatedButton(
+          onPressed: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => ChallengeTimerWidget(challenge: challenge),
+              ),
+            );
+          },
+          style: OutlinedButton.styleFrom(
+            foregroundColor: Colors.white,
+            backgroundColor: Colors.green,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(5),
+            ),
+          ),
+          child: Center(
+            child: Text(
+              ' Open \n ${challenge.focusTime}-${challenge.breakTime}-${challenge.setCount} ',
+              textAlign: TextAlign.center,
+            ),
+          ),
+        ),
+      ];
+    } else if (challenge.winner == FirebaseAuth.instance.currentUser!.email) {
+      return [
+        Container(
+          padding: const EdgeInsets.all(5.0),
+          decoration: BoxDecoration(
+            color: Colors.black,
+            borderRadius: BorderRadius.circular(20),
+          ),
+          child: Center(
+            child: Text(
+              'WIN \n ${challenge.focusTime}-${challenge.breakTime}-${challenge.setCount} ',
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                color: Colors.greenAccent,
+              ),
+            ),
+          ),
+        ),
+      ];
+    } else {
+      return [
+        Container(
+          padding: const EdgeInsets.all(5.0),
+          decoration: BoxDecoration(
+            color: Colors.black,
+            borderRadius: BorderRadius.circular(20),
+          ),
+          child: Center(
+            child: Text(
+              'LOSS \n ${challenge.focusTime}-${challenge.breakTime}-${challenge.setCount} ',
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                color: Colors.redAccent,
+              ),
+            ),
+          ),
+        ),
+      ];
+    }
   }
 
   @override
@@ -370,14 +356,7 @@ class _ChallengeListScreenState extends State<ChallengeListScreen> {
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16.0),
                 child: Text(
-                  'If you finish the challenge first, you will win. If your opponent finishes the challenge first, you will lose.',
-                  style: TextStyle(fontSize: 12.0),
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                child: Text(
-                  'Neither you or your opponent will know if any of you finished the challenge first. So finish challenges as soon as you can if you want to win ;)',
+                  'Whoever finishes the challenge first wins. Neither you or your opponent will know if any of you finished the challenge first. So finish challenges as soon as you can if you want to win ;)',
                   style: TextStyle(fontSize: 12.0),
                 ),
               ),
@@ -394,7 +373,7 @@ class _ChallengeListScreenState extends State<ChallengeListScreen> {
                       child: Padding(
                         padding: EdgeInsets.symmetric(horizontal: 16.0),
                         child: Text(
-                          "REQUESTED CHALLENGES",
+                          "CHALLENGES SENT/RECEIVED",
                           style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                         ),
                       ),

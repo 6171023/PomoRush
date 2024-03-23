@@ -188,7 +188,13 @@ class _ChallengeTimerWidgetState extends State<ChallengeTimerWidget> {
           ],
           content: const SingleChildScrollView(
             child: Text(
-              'Keep this screen open. \nYou will not be able to stop the timer once it starts. \nYou will be required to start from the beginning for the challenge if this page closes. \nYour opponent will be able to watch your timer in real time. \nPoints will be recorded as you participate in the challenge. \nGood luck!',            ),
+              'Keep this screen open. \nYou will not be able to stop the timer once it starts. '
+                  '\nYou will be required to start from the beginning for the challenge if this page closes. '
+                  '\nYour opponent will be able to watch your timer in real time. '
+                  '\nPoints will be recorded as you participate in the challenge. '
+                  '\nFor everytime you finish the set focus minutes, you get equivalent points. '
+                  '\nGood luck!',
+            ),
           ),
         ));
   }
@@ -221,7 +227,7 @@ class _ChallengeTimerWidgetState extends State<ChallengeTimerWidget> {
 
   @override
   void initState() {
-    _uploadTimer = Timer.periodic(const Duration(seconds: 5), (timer) async {
+    _uploadTimer = Timer.periodic(const Duration(seconds: 1), (timer) async {
       await _saveCurrentTimer();
     });
     super.initState();
@@ -361,30 +367,44 @@ class _ChallengeTimerWidgetState extends State<ChallengeTimerWidget> {
     );
   }
 
-  Widget trackOpponentTimer(Challenge chal) => Center(
-    child: CircleAvatar(
-      backgroundColor: Styles.pomodoroPrimaryColor,
-      radius: MediaQuery.of(context).size.width / 4,
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Text(
-            chal.acceptorCurrentState,
-            style: TextStyle(
-                color: chal.acceptorCurrentState == 'Focus' ? Colors.greenAccent : Colors.limeAccent,
-                fontSize: 15.0
+  Widget trackOpponentTimer(Challenge chal) {
+    String opponentState;
+    String opponentTimer;
+
+    if (FirebaseAuth.instance.currentUser!.email ==
+        widget.challenge.acceptorEmail) {
+      opponentState = chal.requesterCurrentState;
+      opponentTimer = chal.requesterCurrentTimer;
+    } else {
+      opponentState = chal.acceptorCurrentState;
+      opponentTimer = chal.acceptorCurrentTimer;
+    }
+
+    return Center(
+      child: CircleAvatar(
+        backgroundColor: Styles.pomodoroPrimaryColor,
+        radius: MediaQuery.of(context).size.width / 4,
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text(
+              opponentState,
+              style: TextStyle(
+                color: opponentState == 'Focus' ? Colors.greenAccent : Colors.limeAccent,
+                fontSize: 15.0,
+              ),
             ),
-          ),
-          Text(
-            chal.acceptorCurrentTimer,
-            style: TextStyle(
-                color: chal.acceptorCurrentState == 'Focus' ? Colors.greenAccent : Colors.limeAccent,
-                fontSize: 25.0
+            Text(
+              opponentTimer,
+              style: TextStyle(
+                color: opponentState == 'Focus' ? Colors.greenAccent : Colors.limeAccent,
+                fontSize: 25.0,
+              ),
             ),
-          )
-        ],
+          ],
+        ),
       ),
-    ),
-  );
+    );
+  }
 
 }

@@ -2,7 +2,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:pomo_rush/models/user.dart';
-import 'package:pomo_rush/models/challenge.dart';
 import 'package:pomo_rush/utils/preferences.dart';
 
 class OnlineActiveUsers extends StatefulWidget {
@@ -13,6 +12,7 @@ class OnlineActiveUsers extends StatefulWidget {
 }
 
 class _OnlineActiveUsersState extends State<OnlineActiveUsers> {
+  late String currentUserDisplayName = '';
   bool isloading = false;
 
   Stream<List<AuthUser>> readUsers() => FirebaseFirestore.instance
@@ -30,6 +30,7 @@ class _OnlineActiveUsersState extends State<OnlineActiveUsers> {
   late String acceptorEndTime = '';
   late String challengeEndTime = '';
   late String? requesterEmail = '';
+  late String requesterName = '';
   late String requesterEndTime = '';
   late String challengeStartTime = '';
   late int breakTime = 5;
@@ -40,13 +41,22 @@ class _OnlineActiveUsersState extends State<OnlineActiveUsers> {
     setState(() {
       isloading = true;
     });
+
+    QuerySnapshot userSnapshot = await FirebaseFirestore.instance
+        .collection('users')
+        .where('email', isEqualTo: requesterEmail)
+        .get();
+    DocumentSnapshot userDoc = userSnapshot.docs.first;
+    Map<String, dynamic> userData = userDoc.data() as Map<String, dynamic>;
+    requesterName = userData['displayName'];
+
     CollectionReference challenge = FirebaseFirestore.instance.collection('challenge');
     DateTime now = DateTime.now();
     var data = {
       "createdAt": now,
       "winner": winner,
       "acceptorDisplayName": acceptorName,
-      "requesterDisplayName": FirebaseAuth.instance.currentUser!.displayName,
+      "requesterDisplayName": requesterName,
       "acceptorEmail": acceptorEmail,
       "acceptorEndTime": acceptorEndTime,
       "breakTime": breakTime,
@@ -259,31 +269,29 @@ class _OnlineActiveUsersState extends State<OnlineActiveUsers> {
       builder: (context, snapshot) {
         if (snapshot.hasData) {
           final users = snapshot.data!;
-          return Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: <Widget>[
-              const SizedBox(
-                height: 20,
-              ),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                child: Text(
-                  'Use the request button to send challenges to anyone here and use the challenge screen to view your request status and/or participate in the accepted challenges.',
-                  style: TextStyle(fontSize: 15.0),
+          return SingleChildScrollView(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: <Widget>[
+                const SizedBox(height: 20),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                  child: Text(
+                    'Use the request button to send challenges to anyone here and use the challenge screen to view your request status and/or participate in the accepted challenges.',
+                    style: TextStyle(fontSize: 15.0),
+                  ),
                 ),
-              ),
-              const SizedBox(
-                height: 10,
-              ),
-              Expanded(
-                child: ListView.builder(
+                const SizedBox(height: 10),
+                ListView.builder(
+                  shrinkWrap: true,
+                  physics: NeverScrollableScrollPhysics(),
                   itemCount: users.length,
                   itemBuilder: (context, index) {
                     return buildUser(users[index]);
                   },
                 ),
-              ),
-            ],
+              ],
+            ),
           );
         } else {
           return const Center(child: CircularProgressIndicator());
@@ -371,7 +379,6 @@ class _OnlineActiveUsersState extends State<OnlineActiveUsers> {
                 : ElevatedButton(
               onPressed: () {
                 setState(() {
-                  //set the value on clicking request
                   requesterEmail = FirebaseAuth.instance.currentUser!.email;
                   acceptorEmail = user.email;
                   acceptorName = user.displayName;
