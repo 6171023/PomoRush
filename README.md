@@ -18,4 +18,4 @@ In summary, the code does the following:
 - Has a leaderboard page that ranks users based on points
 - Has a real-time challenging feature that allows two users to use the Pomodoro timer in real-time (everything is updated in Firebase accordingly)
 
-<img width="897" alt="preview" src="https://github.com/6171023/pomo_rush/assets/108916430/2ace3918-4ddd-4a25-9e39-96c5d3bca43d">
+<img width="899" alt="preview" src="https://github.com/6171023/PomoRush/assets/108916430/e25acd4d-592e-4e8b-a5be-e63582398ec2">
